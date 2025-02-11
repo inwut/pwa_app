@@ -1,0 +1,61 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 3rem;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    background-color: #F9FAEF;
+}
+
+.header--view {
+    flex-direction: column;
+    align-items: start;
+}
+
+.nav {
+    display: none;
+}
+
+.nav--view {
+    width: 100%;
+}
+
+.nav--visible {
+    display: flex;
+}
+
+.header__logo a {
+    font-size: 1.8rem;
+    font-family: "Newsreader", serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    color: #141E0C;
+}
+
+.header__menu-button {
+    position: absolute;
+    top: 1.5rem;
+    right: 3rem;
+}
+
+@media (min-width: 800px) {
+    .nav {
+        display: flex;
+    }
+
+    .header--view {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .nav--view {
+        width: fit-content;
+    }
+
+    .header__menu-button {
+        display: none;
+    }
+}
