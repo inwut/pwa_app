@@ -1,0 +1,42 @@
+.button {
+    padding: 0.6rem 1.1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+    font-family: "Libre Franklin", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.button--medium {
+    font-size: 1rem;
+}
+
+.button--large {
+    font-size: 1.2rem
+}
+
+.button--icon {
+    padding: 0.6rem;
+}
+
+.button--filled {
+    border-radius: 50rem;
+    background-color: #476730;
+    color: #FFFFFF;
+    font-weight: 500;
+}
+
+.button--transparent {
+    color: #74796D;
+    font-weight: 500;
+}
+
+.button--filled:hover {
+    color: #C3CEB7;
+}
+
+.button--transparent:hover {
+    color: #141E0C;
+}
