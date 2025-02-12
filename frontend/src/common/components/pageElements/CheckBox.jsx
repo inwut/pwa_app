@@ -24,11 +24,11 @@ const CheckBox = ({ label, onCheck }) => {
         slotProps={{
           typography: {
             sx: {
-              fontSize: "0.8rem",
-              fontFamily: "Libre Franklin",
-              fontWeight: 500,
-              fontStyle: "normal",
               color: "#74796D",
+              fontSize: "0.9rem",
+              fontFamily: "Libre Franklin",
+              fontWeight: 400,
+              fontStyle: "normal",
             },
           },
         }}

@@ -1,33 +1,39 @@
 import React, { useState } from "react";
-import { Link, Outlet } from "react-router-dom";
-import NavLinks from "./NavLinks.jsx";
+import { Link } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
 
 import "./NavBar.css";
+import NavLinks from "./NavLinks.jsx";
+
 const NavBar = () => {
-  const [openMenu, setOpenMenu] = useState(false);
+  const [openNav, setOpenNav] = useState(false);
+  const [navRendered, setNavRendered] = useState(false);
 
   const toggleMenuHandler = () => {
-    setOpenMenu((prevState) => !prevState);
+    if (openNav) {
+      setOpenNav(false);
+      setTimeout(() => setNavRendered(false), 300);
+    } else {
+      setNavRendered(true);
+      setTimeout(() => setOpenNav(true), 10);
+    }
   };
 
   return (
-    <>
-      <header className="header header--view ">
-        <h1 className="header__logo">
-          <Link to="/">Recipegram</Link>
-        </h1>
-        <button className="header__menu-button" onClick={toggleMenuHandler}>
-          <MenuIcon sx={{ color: "#141E0C", fontSize: "2rem" }} />
-        </button>
-        <nav
-          className={openMenu ? "nav nav--view nav--visible" : "nav nav--view"}
-        >
-          <NavLinks />
-        </nav>
-      </header>
-      <Outlet />
-    </>
+    <header className="header">
+      <h1 className="header__logo">
+        <Link to="/">Recipegram</Link>
+      </h1>
+      <button className="header__menu-button" onClick={toggleMenuHandler}>
+        {openNav ? <CloseIcon /> : <MenuIcon />}
+      </button>
+      <nav
+        className={`nav ${navRendered && "nav--visible"} ${openNav && "nav--transitioned"}`}
+      >
+        <NavLinks onLinkCLick={toggleMenuHandler} />
+      </nav>
+    </header>
   );
 };
 

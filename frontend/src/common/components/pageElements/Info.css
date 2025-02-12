@@ -1,15 +1,14 @@
-.page-header {
+.info {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
+    align-items: start;
     gap: 1.5rem;
-    margin: 2rem 0 1rem 0;
 }
 
 
 @media (min-width: 800px) {
-    .page-header {
+    .info {
         flex-direction: row;
+        align-items: center;
     }
 }

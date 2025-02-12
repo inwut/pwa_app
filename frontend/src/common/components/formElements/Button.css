@@ -1,5 +1,4 @@
 .button {
-    padding: 0.6rem 1.1rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -22,19 +21,21 @@
 }
 
 .button--filled {
+    padding: 0.6rem 1.1rem;
     border-radius: 50rem;
     background-color: #476730;
-    color: #FFFFFF;
     font-weight: 500;
+    color: #FFFFFF;
+    transition: transform 0.3s ease;
 }
 
 .button--transparent {
+    font-weight: 400;
     color: #74796D;
-    font-weight: 500;
 }
 
 .button--filled:hover {
-    color: #C3CEB7;
+    transform: scale(0.8);
 }
 
 .button--transparent:hover {

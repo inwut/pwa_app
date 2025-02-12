@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 
 import "./App.css";
 import HomePage from "./home/pages/HomePage.jsx";
@@ -14,10 +14,12 @@ import ProfilePage from "./users/pages/ProfilePage.jsx";
 import UsersPage from "./users/pages/UsersPage.jsx";
 import NavBar from "./common/components/navigation/Navbar.jsx";
 
-const AppLayout = ({ children }) => (
+const AppLayout = () => (
   <>
     <NavBar />
-    {children}
+    <main className="main">
+      <Outlet />
+    </main>
   </>
 );
 

@@ -2,7 +2,7 @@ import React from "react";
 
 import "./Button.css";
 
-const Button = ({ type, text, icon, onClick, disabled, size, filled }) => {
+const Button = ({ type, text, icon, size, filled, onClick, disabled }) => {
   return (
     <button
       type={type}
