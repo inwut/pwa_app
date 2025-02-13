@@ -1,0 +1,81 @@
+.autocomplete {
+    position: relative;
+    margin: 2rem 0;
+}
+
+.autocomplete__wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.autocomplete__input {
+    color: #141E0C;
+    background-color: #F9FAEF;
+    font-size: 0.9rem;
+    margin: 0.8rem 0;
+    border: none;
+    outline: 0;
+}
+
+.autocomplete__item {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    border-radius: 50rem;
+    background-color: #EDEFE4;
+    font-family: "Libre Franklin", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.9rem;
+    outline: 0;
+    overflow: hidden;
+}
+
+.autocomplete__item span {
+    margin-right: 0.3rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.autocomplete__item svg {
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.autocomplete__list {
+    position: absolute;
+    left: 0;
+    z-index: 1;
+    margin-top: 0.4rem;
+    padding: 0.5rem 0.3rem;
+    width: 100%;
+    max-height: 18rem;
+    border: 1px solid #E1E4D9;
+    border-radius: 2rem;
+    background-color: #EDEFE4;
+    list-style: none;
+    overflow: auto;
+}
+
+.autocomplete__list li {
+    display: flex;
+    padding: 0.5rem 0.8rem;
+    border-radius: 50rem;
+    font-family: Libre Franklin, serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+
+.autocomplete__list li[aria-selected = "true"] {
+    background-color: #C3CEB7;
+}
+
+.autocomplete__list li.Mui-focused {
+    background-color: #E1E4D9;
+    cursor: pointer;
+}

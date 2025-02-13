@@ -8,6 +8,7 @@ const CheckBox = ({ label, onCheck }) => {
       <FormControlLabel
         control={
           <Checkbox
+            id="only-following-checkbox"
             onChange={onCheck}
             color="success"
             size="small"
