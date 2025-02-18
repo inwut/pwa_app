@@ -6,7 +6,7 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: start;
-    padding: 1.5rem 3rem;
+    padding: 1.7rem 2.5rem;
     width: 100%;
     background-color: #F9FAEF;
 }
@@ -16,6 +16,7 @@
     z-index: 2;
     display: none;
     width: 100%;
+    padding-top: 2rem;
     opacity: 0;
     transform: translateY(-2rem);
     transition: opacity 0.3s ease, transform 0.3s ease;
@@ -31,7 +32,7 @@
 }
 
 .header__logo a {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-family: "Newsreader", serif;
     font-optical-sizing: auto;
     font-weight: 500;
@@ -40,7 +41,7 @@
 }
 
 .header__menu-button {
-    padding: 0.5rem;
+    padding: 0.5rem 0;
     position: absolute;
     top: 1.5rem;
     right: 3rem;
@@ -50,6 +51,13 @@
 
 @media (min-width: 800px) {
     .header {
+        padding: 1.7rem 4rem;
+    }
+}
+
+
+@media (min-width: 870px) {
+    .header {
         flex-direction: row;
         align-items: center;
     }
@@ -57,6 +65,7 @@
     .nav {
         display: flex;
         width: fit-content;
+        padding: 0;
         opacity: 1;
         transform: none;
     }

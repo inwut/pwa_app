@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
+    gap: 1.8rem;
     margin: 1.5rem 0;
     width: 100%;
     list-style: none;
@@ -10,7 +10,7 @@
 
 .nav__links a {
     color: #141E0C;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-family: "Libre Franklin", serif;
     font-optical-sizing: auto;
     font-weight: 600;
@@ -26,7 +26,7 @@
     color: #FFFFFF;
 }
 
-@media (min-width: 800px) {
+@media (min-width: 870px) {
     .nav__links {
         flex-direction: row;
         width: fit-content;

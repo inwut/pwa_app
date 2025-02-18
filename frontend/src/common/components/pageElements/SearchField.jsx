@@ -23,7 +23,7 @@ const SearchField = ({ value, onSearch, placeholder }) => {
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   width: "100%",
   color: "#141E0C",
-  fontSize: "0.9rem",
+  fontSize: "1rem",
   fontFamily: "Libre Franklin",
   fontOpticalSizing: "auto",
   fontWeight: 400,
@@ -34,7 +34,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     [theme.breakpoints.up("sm")]: {
       width: "7rem",
       "&:focus": {
-        width: "12rem",
+        width: "14rem",
       },
     },
   },

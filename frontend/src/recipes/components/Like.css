@@ -1,0 +1,33 @@
+.like {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.like svg, .like span.MuiTypography-root {
+    font-size: 1.3rem;
+    transition: all 0.1s ease-in-out;
+}
+
+.like span.MuiTypography-root {
+    font-family: "Libre Franklin", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: #74796D;
+}
+
+.like label {
+    margin: 0;
+}
+
+@media (min-width: 480px) {
+    .like span.MuiTypography-root {
+        font-size: 1rem;
+    }
+
+    .like svg {
+        font-size: 2rem;
+    }
+}

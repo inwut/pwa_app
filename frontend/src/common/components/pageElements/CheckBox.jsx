@@ -26,7 +26,7 @@ const CheckBox = ({ label, onCheck }) => {
           typography: {
             sx: {
               color: "#74796D",
-              fontSize: "0.9rem",
+              fontSize: "1rem",
               fontFamily: "Libre Franklin",
               fontWeight: 400,
               fontStyle: "normal",
