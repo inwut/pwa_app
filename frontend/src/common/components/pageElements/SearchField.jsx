@@ -8,7 +8,7 @@ const SearchField = ({ value, onSearch, placeholder }) => {
   return (
     <div className="search">
       <div className="search__icon">
-        <SearchIcon sx={{ color: "#74796D" }} />
+        <SearchIcon />
       </div>
       <StyledInputBase
         id="recipe-search"
@@ -34,7 +34,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     [theme.breakpoints.up("sm")]: {
       width: "7rem",
       "&:focus": {
-        width: "14rem",
+        width: "12rem",
       },
     },
   },

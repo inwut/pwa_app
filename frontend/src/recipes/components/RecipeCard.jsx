@@ -3,19 +3,22 @@ import { Link } from "react-router-dom";
 
 import "./RecipeCard.css";
 import Like from "./LIke.jsx";
+import Info from "../../common/components/pageElements/Info.jsx";
 
-const RecipeCard = ({ title, image, author, id }) => {
+const RecipeCard = ({ id, title, image, author, likes }) => {
   return (
     <div className="recipe-card">
-      <Link to={id}>
+      <Link to={`/recipes/${id}`}>
         <img src={image} alt={title} className="recipe-card__image" />
       </Link>
       <div className="recipe-card__info">
         <div>
-          <h3 className="recipe-card__title">{title}</h3>
-          <span className="info__item recipe-card__author">{author}</span>
+          <h3 className="text--primary recipe-card__title">{title}</h3>
+          <Info>
+            <span className="recipe-card__author">{author}</span>
+          </Info>
         </div>
-        <Like numberOfLikes="45" />
+        <Like likes={likes} />
       </div>
     </div>
   );

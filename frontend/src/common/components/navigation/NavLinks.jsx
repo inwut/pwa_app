@@ -5,7 +5,7 @@ import "./NavLinks.css";
 
 const NavLinks = ({ onLinkCLick }) => {
   return (
-    <ul className="nav__links">
+    <ul className="nav__links text--primary">
       <li>
         <NavLink to="/recipes" onClick={onLinkCLick}>
           Recipes

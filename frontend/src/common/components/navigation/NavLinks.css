@@ -5,16 +5,17 @@
     gap: 1.8rem;
     margin: 1.5rem 0;
     width: 100%;
+    color: #141E0C;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: padding ease-in-out 0.3s;
     list-style: none;
 }
 
 .nav__links a {
     color: #141E0C;
     font-size: 1.1rem;
-    font-family: "Libre Franklin", serif;
-    font-optical-sizing: auto;
     font-weight: 600;
-    font-style: normal;
     transition: padding ease-in-out 0.3s;
 }
 

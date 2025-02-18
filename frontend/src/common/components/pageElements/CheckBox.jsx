@@ -2,9 +2,11 @@ import React from "react";
 import Checkbox from "@mui/material/Checkbox";
 import { FormControlLabel } from "@mui/material";
 
+import "./CheckBox.css";
+
 const CheckBox = ({ label, onCheck }) => {
   return (
-    <div>
+    <div className="checkbox text--primary">
       <FormControlLabel
         control={
           <Checkbox
@@ -12,27 +14,10 @@ const CheckBox = ({ label, onCheck }) => {
             onChange={onCheck}
             color="success"
             size="small"
-            sx={{
-              color: "#74796D",
-              "&.Mui-checked": {
-                color: "#476730",
-              },
-            }}
           />
         }
         label={label}
         labelPlacement="end"
-        slotProps={{
-          typography: {
-            sx: {
-              color: "#74796D",
-              fontSize: "1rem",
-              fontFamily: "Libre Franklin",
-              fontWeight: 400,
-              fontStyle: "normal",
-            },
-          },
-        }}
       />
     </div>
   );

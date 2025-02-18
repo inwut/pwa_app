@@ -29,7 +29,7 @@ const NavBar = () => {
         {openNav ? <CloseIcon /> : <MenuIcon />}
       </button>
       <nav
-        className={`nav ${navRendered && "nav--visible"} ${openNav && "nav--transitioned"}`}
+        className={`nav ${navRendered && "nav--visible"} ${openNav && "nav--opened"}`}
       >
         <NavLinks onLinkCLick={toggleMenuHandler} />
       </nav>

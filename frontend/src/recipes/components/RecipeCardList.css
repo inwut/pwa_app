@@ -1,0 +1,13 @@
+.recipe-card-list {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, 100%);
+    justify-content: center;
+    margin-top: 5rem;
+}
+
+@media (min-width: 480px) {
+    .recipe-card-list {
+        grid-template-columns: repeat(auto-fit, 23rem);
+    }
+}

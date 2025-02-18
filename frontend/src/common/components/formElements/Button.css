@@ -3,9 +3,6 @@
     justify-content: center;
     align-items: center;
     gap: 0.2rem;
-    font-family: "Libre Franklin", serif;
-    font-optical-sizing: auto;
-    font-style: normal;
 }
 
 .button--medium {

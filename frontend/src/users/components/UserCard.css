@@ -1,0 +1,21 @@
+.user-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.2rem;
+    background-color: #EDEFE4;
+    border: 0.1rem solid #E1E4D9;
+    border-radius: 1.5rem;
+    transition: transform ease-in-out 0.3s;
+}
+
+.user-card:hover {
+    transform: translateY(-0.7rem);
+}
+
+.user-card__username {
+    margin-bottom: 2rem;
+    color: #141E0C;
+    font-size: 1.5rem;
+    font-weight: 600;
+}

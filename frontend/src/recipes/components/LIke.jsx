@@ -5,11 +5,10 @@ import Favorite from "@mui/icons-material/Favorite";
 
 import "./Like.css";
 import { FormControlLabel } from "@mui/material";
-const Like = ({ onLike, numberOfLikes }) => {
+const Like = ({ onLike, likes }) => {
   return (
     <div className="like">
       <FormControlLabel
-        value="bottom"
         control={
           <Checkbox
             name="like"
@@ -17,16 +16,9 @@ const Like = ({ onLike, numberOfLikes }) => {
             checkedIcon={<Favorite />}
             onChange={onLike}
             color="success"
-            sx={{
-              paddingBottom: "0.2rem",
-              color: "#74796D",
-              "&.Mui-checked": {
-                color: "#476730",
-              },
-            }}
           />
         }
-        label={numberOfLikes}
+        label={likes}
         labelPlacement="bottom"
       />
     </div>

@@ -1,0 +1,16 @@
+.checkbox label {
+    color: #74796D;
+    font-size: 1rem;
+    font-weight: 400;
+    font-family: "Libre Franklin", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.checkbox span {
+    color: #74796D;
+}
+
+.checkbox span.Mui-checked {
+    color: #476730;
+}
