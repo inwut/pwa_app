@@ -39,7 +39,7 @@ function App() {
           <Route path="users" element={<UsersPage />} />
           <Route
             path="profile/:userId/followings"
-            element={<UsersPage type="followings" />}
+            element={<UsersPage type="following" />}
           />
           <Route
             path="profile/:userId/followers"

@@ -1,0 +1,40 @@
+.form label, .form input {
+    font-family: "Libre Franklin", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    color: #74796D;
+}
+
+.form input {
+    color: #141E0C;
+}
+
+.form label.Mui-focused {
+    color: #476730;
+}
+
+.form .Mui-underline:after {
+    border-bottom-color: #476730;
+}
+
+.form .MuiOutlinedInput-root fieldset {
+    border-color: #E0E3E7;
+}
+
+.form .MuiOutlinedInput-root:hover fieldset {
+    border-color: #476730;
+}
+
+.form .MuiOutlinedInput-root.Mui-focused fieldset {
+    border-color: #476730;
+}
+
+.form__auth-button {
+    margin-top: 2rem;
+}
+
+@media(min-width: 670px) {
+    .form div.MuiFormControl-root {
+        width: 35rem;
+    }
+}

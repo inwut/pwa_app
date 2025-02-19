@@ -5,6 +5,11 @@
     gap: 0.2rem;
 }
 
+.button--filled:disabled {
+    background-color: #74796D;
+    pointer-events: none;
+}
+
 .button--medium {
     font-size: 1.1rem;
 }
@@ -24,6 +29,10 @@
     font-weight: 600;
     color: #FFFFFF;
     transition: transform 0.3s ease;
+}
+
+.button--filled.button--large {
+    padding: 0.6rem 1.5rem;
 }
 
 .button--transparent {
