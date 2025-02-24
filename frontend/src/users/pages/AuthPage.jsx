@@ -40,11 +40,12 @@ const AuthPage = () => {
         {signUpMode && (
           <TextField
             label="Username"
+            type="text"
             {...register("username", {
               required: "Username is required.",
               minLength: {
                 value: 3,
-                message: "Username should be minimum of 2 symbols.",
+                message: "Username should be minimum of 3 symbols.",
               },
             })}
             error={!!errors.username}
@@ -55,6 +56,7 @@ const AuthPage = () => {
         )}
         <TextField
           label="Email"
+          type="email"
           {...register("email", {
             required: "Email is required.",
             pattern: {

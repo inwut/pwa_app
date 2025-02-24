@@ -28,7 +28,7 @@ const UsersPage = ({ type }) => {
   return (
     <>
       <PageHeader>
-        {type === "followings" ? (
+        {type === "following" ? (
           <PageTitle text="Following" />
         ) : type === "followers" ? (
           <PageTitle text="Followers" />

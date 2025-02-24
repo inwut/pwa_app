@@ -1,6 +1,79 @@
-import React from 'react';
+import React from "react";
+import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
+import { Link } from "react-router-dom";
+
+import "./ProfilePage.css";
+import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
+import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
+import Button from "../../common/components/formElements/Button.jsx";
+import Info from "../../common/components/pageElements/Info.jsx";
+import RecipeCardList from "../../recipes/components/RecipeCardList.jsx";
+
 const ProfilePage = () => {
-    return <h1>Profile Page</h1>
-}
+  const user = {
+    id: 0,
+    username: "dariavetrykush",
+    followers: 34,
+    following: 12,
+    recipes: [
+      {
+        id: 1,
+        image:
+          "https://wallpapers.com/images/hd/aesthetic-food-pictures-yw84jpuaeol0h8vh.jpg",
+        title: "Healthy breakfast",
+        author: "dariavetrykush",
+        likes: 56,
+      },
+      {
+        id: 2,
+        image:
+          "https://www.dish-works.com/wp-content/uploads/P03A-French-Onion-Greek-Yogurt-Dip-Kale-Salad-800x533.jpg",
+        title: "Salad",
+        author: "semytskiy",
+        likes: 56,
+      },
+      {
+        id: 3,
+        image: "https://scx2.b-cdn.net/gfx/news/2020/healthyfood.jpg",
+        title: "Cereal with berries",
+        author: "inwut",
+        likes: 56,
+      },
+    ],
+  };
+  return (
+    <>
+      <PageHeader>
+        <PageTitle text={`@${user.username}`} classNames="profile__username" />
+        {user.id === 0 ? (
+          <Button icon={<EditIcon />} size="large" />
+        ) : (
+          <Button text="Subscribe" type="button" filled size="large" />
+        )}
+      </PageHeader>
+      <Info>
+        <span>{user.recipes.length} Recipes</span>
+        <Link to="followers">
+          <Button text={`${user.followers} Followers`} />
+        </Link>
+        <Link to="following">
+          <Button text={`${user.following} Following`} />
+        </Link>
+      </Info>
+      <RecipeCardList recipes={user.recipes} />
+      {user.id === 0 && (
+        <Link to="/recipes/create">
+          <Button
+            filled
+            icon={<AddIcon />}
+            size="large"
+            classNames="profile__add-button"
+          />
+        </Link>
+      )}
+    </>
+  );
+};
 
 export default ProfilePage;

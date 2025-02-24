@@ -9,13 +9,15 @@
     transition: transform ease-in-out 0.3s;
 }
 
-.user-card:hover {
-    transform: translateY(-0.7rem);
-}
-
 .user-card__username {
     margin-bottom: 2rem;
     color: #141E0C;
     font-size: 1.5rem;
     font-weight: 600;
+}
+
+@media (min-width: 800px) {
+    .user-card:hover {
+        transform: translateY(-0.7rem);
+    }
 }

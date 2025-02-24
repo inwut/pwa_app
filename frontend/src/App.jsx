@@ -38,7 +38,7 @@ function App() {
           <Route path="profile/:userId" element={<ProfilePage />} />
           <Route path="users" element={<UsersPage />} />
           <Route
-            path="profile/:userId/followings"
+            path="profile/:userId/following"
             element={<UsersPage type="following" />}
           />
           <Route
