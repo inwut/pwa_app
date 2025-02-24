@@ -1,0 +1,43 @@
+.table {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.table .MuiTableContainer-root {
+    width: fit-content;
+    padding: 1rem 0.5rem;
+    border-radius: 1.2rem;
+    border: 0.1rem solid #E1E4D9;
+    background-color: #EDEFE4;
+    box-shadow: none;
+}
+
+.table .MuiTable-root {
+    min-width: 20rem;
+    background-color: #EDEFE4;
+}
+
+.table .MuiTableCell-root {
+    border: none;
+    text-align: end;
+    font-size: 1rem;
+    font-family: "Libre Franklin", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-weight: 400;
+    color: #141E0C;
+}
+
+.table .MuiTableCell-head {
+    padding-bottom: 1.2rem;
+    font-weight: 600;
+}
+
+.table .MuiTableCell-root:first-child {
+    text-align: start;
+}
+
+.table__title {
+    font-size: 1.8rem;
+}
