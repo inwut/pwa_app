@@ -1,0 +1,12 @@
+.image {
+    border-radius: 1.5rem;
+    width: 100%;
+    aspect-ratio: 9 / 7.5;
+    object-fit: cover;
+}
+
+@media (min-width: 670px) {
+    .image {
+        width: 30rem;
+    }
+}
