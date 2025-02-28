@@ -14,19 +14,19 @@
 }
 
 .table .MuiTable-root {
-    min-width: 20rem;
+    width: 25rem;
     background-color: #EDEFE4;
 }
 
 .table .MuiTableCell-root {
     border: none;
     text-align: end;
+    color: #141E0C;
     font-size: 1rem;
     font-family: "Libre Franklin", serif;
     font-optical-sizing: auto;
     font-style: normal;
     font-weight: 400;
-    color: #141E0C;
 }
 
 .table .MuiTableCell-head {
@@ -36,8 +36,4 @@
 
 .table .MuiTableCell-root:first-child {
     text-align: start;
-}
-
-.table__title {
-    font-size: 1.8rem;
 }

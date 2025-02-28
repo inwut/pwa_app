@@ -10,9 +10,3 @@
         right: 4rem;
     }
 }
-
-@media (max-width: 600px) {
-    .profile__username {
-        font-size: 2.2rem;
-    }
-}

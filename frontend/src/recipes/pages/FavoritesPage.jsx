@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
+
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
 import SearchField from "../../common/components/pageElements/SearchField.jsx";
 import RecipeCardList from "../components/RecipeCardList.jsx";
+
 const FavoritesPage = () => {
-  const recipes = [
+  const [recipes, setRecipes] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearchInput] = useDebounce(searchInput, 1000);
+
+  const testRecipes = [
     {
       id: 1,
       image:
@@ -12,6 +19,7 @@ const FavoritesPage = () => {
       title: "Healthy breakfast",
       author: "dariavetrykush",
       likes: 56,
+      isLiked: true,
     },
     {
       id: 2,
@@ -20,6 +28,7 @@ const FavoritesPage = () => {
       title: "Salad",
       author: "semytskiy",
       likes: 56,
+      isLiked: false,
     },
     {
       id: 3,
@@ -27,14 +36,28 @@ const FavoritesPage = () => {
       title: "Cereal with berries",
       author: "inwut",
       likes: 56,
+      isLiked: true,
     },
   ];
+
+  useEffect(() => {
+    fetchRecipes();
+  }, [debouncedSearchInput]);
+
+  const fetchRecipes = () => {
+    // api request
+    setRecipes(testRecipes);
+  };
 
   return (
     <>
       <PageHeader>
         <PageTitle text="Favorites" />
-        <SearchField placeholder="Recipe name" />
+        <SearchField
+          placeholder="Recipe name"
+          value={searchInput}
+          onSearch={(e) => setSearchInput(e.target.value)}
+        />
       </PageHeader>
       <RecipeCardList recipes={recipes} />
     </>

@@ -1,15 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-import "./RecipesPage.css";
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
 import SearchField from "../../common/components/pageElements/SearchField.jsx";
 import CheckBox from "../../common/components/pageElements/CheckBox.jsx";
 import ProductsAutocomplete from "../components/ProductsAutocomplete.jsx";
 import RecipeCardList from "../components/RecipeCardList.jsx";
+import { useDebounce } from "use-debounce";
 
 const RecipesPage = () => {
-  const recipes = [
+  const [recipes, setRecipes] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearchInput] = useDebounce(searchInput, 1000);
+  const [onlyFollowing, setOnlyFollowing] = useState(false);
+  const [ingredients, setIngredients] = useState([]);
+
+  const testRecipes = [
     {
       id: 1,
       image:
@@ -17,6 +23,7 @@ const RecipesPage = () => {
       title: "Healthy breakfast",
       author: "dariavetrykush",
       likes: 56,
+      isLiked: true,
     },
     {
       id: 2,
@@ -25,6 +32,7 @@ const RecipesPage = () => {
       title: "Salad",
       author: "semytskiy",
       likes: 56,
+      isLiked: false,
     },
     {
       id: 3,
@@ -32,18 +40,45 @@ const RecipesPage = () => {
       title: "Cereal with berries",
       author: "inwut",
       likes: 56,
+      isLiked: true,
     },
   ];
+
+  useEffect(() => {
+    fetchRecipes();
+  }, [debouncedSearchInput, onlyFollowing, ingredients]);
+
+  const fetchRecipes = () => {
+    // api request
+    setRecipes(testRecipes);
+  };
+
+  const toggleCheckBoxHandler = () => {
+    setOnlyFollowing((prevState) => !prevState);
+  };
+
+  const changeIngredientsHandler = (data) => {
+    setIngredients(data);
+  };
+
   return (
     <>
       <PageHeader>
         <PageTitle text="Recipes" />
         <div className="page-header__toolbar">
-          <SearchField value="" onSearch={() => {}} placeholder="Recipe name" />
-          <CheckBox label="Only following" onCheck={() => {}} />
+          <SearchField
+            placeholder="Recipe name"
+            value={searchInput}
+            onSearch={(e) => setSearchInput(e.target.value)}
+          />
+          <CheckBox
+            label="Only following"
+            onCheck={toggleCheckBoxHandler}
+            checked={onlyFollowing}
+          />
         </div>
       </PageHeader>
-      <ProductsAutocomplete />
+      <ProductsAutocomplete onIngredientsChange={changeIngredientsHandler} />
       <RecipeCardList recipes={recipes} />
     </>
   );

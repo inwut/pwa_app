@@ -1,19 +1,12 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import useAutocomplete from "@mui/material/useAutocomplete";
 import CloseIcon from "@mui/icons-material/Close";
 
 import "./ProductsAutocomplete.css";
 
-const AutocompleteItem = ({ label, onDelete, ...other }) => {
-  return (
-    <div className="autocomplete__item" {...other}>
-      <span>{label}</span>
-      <CloseIcon onClick={onDelete} />
-    </div>
-  );
-};
+const ProductsAutocomplete = ({ onIngredientsChange }) => {
+  const [ingredients, setIngredients] = useState([]);
 
-const ProductsAutocomplete = ({ options }) => {
   const {
     getRootProps,
     getInputProps,
@@ -25,22 +18,50 @@ const ProductsAutocomplete = ({ options }) => {
   } = useAutocomplete({
     id: "products-autocomplete",
     multiple: true,
-    options: options,
-    getOptionLabel: (option) => option.title,
+    options: ingredients,
+    getOptionLabel: (option) => option.name,
   });
+
+  const testIngredients = [
+    { id: 1, name: "Bread" },
+    { id: 2, name: "Water" },
+    { id: 3, name: "Salt" },
+  ];
+
+  useEffect(() => {
+    fetchIngredients();
+  }, []);
+
+  useEffect(() => {
+    if (onIngredientsChange) {
+      onIngredientsChange(value);
+    }
+  }, [value, onIngredientsChange]);
+
+  const fetchIngredients = () => {
+    // api request
+    setIngredients(testIngredients);
+  };
 
   return (
     <section className="autocomplete" {...getRootProps()}>
       <div className="autocomplete__wrapper">
         {value.map((option, index) => {
-          const { key, ...tagProps } = getTagProps({ index });
+          const { key, onDelete, ...other } = getTagProps({ index });
           return (
-            <AutocompleteItem key={key} {...tagProps} label={option.title} />
+            <div
+              className="autocomplete__item text--primary"
+              key={key}
+              {...other}
+            >
+              <span>{option.name}</span>
+              <CloseIcon onClick={onDelete} />
+            </div>
           );
         })}
         <input
           id="product-input"
-          placeholder="Product..."
+          placeholder="Ingredient..."
           className="autocomplete__input"
           {...getInputProps()}
         />
@@ -50,8 +71,8 @@ const ProductsAutocomplete = ({ options }) => {
           {groupedOptions.map((option, index) => {
             const { key, ...optionProps } = getOptionProps({ option, index });
             return (
-              <li key={key} {...optionProps}>
-                {option.title}
+              <li key={key} className="text--primary" {...optionProps}>
+                {option.name}
               </li>
             );
           })}
@@ -60,5 +81,4 @@ const ProductsAutocomplete = ({ options }) => {
     </section>
   );
 };
-
 export default ProductsAutocomplete;

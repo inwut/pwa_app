@@ -24,7 +24,11 @@ const AuthPage = () => {
   };
 
   const onSubmit = (data) => {
-    console.log(data);
+    if (signUpMode) {
+      // api request sign up
+    } else {
+      // api request log in
+    }
   };
 
   return (

@@ -14,6 +14,7 @@ const RecipeCardList = ({ recipes }) => {
           title={recipe.title}
           author={`@${recipe.author}`}
           likes={recipe.likes}
+          isLiked={recipe.isLiked}
         />
       ))}
     </section>

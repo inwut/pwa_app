@@ -4,13 +4,14 @@ import { FormControlLabel } from "@mui/material";
 
 import "./CheckBox.css";
 
-const CheckBox = ({ label, onCheck }) => {
+const CheckBox = ({ label, onCheck, checked }) => {
   return (
     <div className="checkbox text--primary">
       <FormControlLabel
         control={
           <Checkbox
             id="only-following-checkbox"
+            checked={checked}
             onChange={onCheck}
             color="success"
             size="small"

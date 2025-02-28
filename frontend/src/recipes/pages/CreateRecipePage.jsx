@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import PhotoIcon from "@mui/icons-material/Photo";
 import TextField from "@mui/material/TextField";
 import { useForm } from "react-hook-form";
@@ -11,19 +12,46 @@ import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
 import IngredientsForm from "../components/IngredientsForm.jsx";
 import Button from "../../common/components/formElements/Button.jsx";
 import IngredientsTable from "../components/IngredientsTable.jsx";
+import Image from "../../common/components/pageElements/Image.jsx";
 
 const CreateRecipePage = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
   });
 
+  const recipeId = useParams().recipeId;
+
   const [ingredients, setIngredients] = useState([]);
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState("");
+
+  useEffect(() => {
+    if (recipeId) {
+      // api request
+      setValue("title", "Healthy breakfast", { shouldValidate: true });
+      setValue("instructions", "Instructions", {
+        shouldValidate: true,
+      });
+      setPhoto("PHOTO");
+      setPhotoPreview(
+        "https://wallpapers.com/images/hd/aesthetic-food-pictures-yw84jpuaeol0h8vh.jpg",
+      );
+      setIngredients([{ id: 1, ingredient: "bread", amount: "2" }]);
+    }
+  }, []);
+
+  const onSubmit = (data) => {
+    if (recipeId) {
+      // api request put
+    } else {
+      // api request post
+    }
+  };
 
   const addIngredientHandler = (ingredient) => {
     setIngredients([...ingredients, { id: uuidv4(), ...ingredient }]);
@@ -50,14 +78,10 @@ const CreateRecipePage = () => {
     setPhotoPreview("");
   };
 
-  const onSubmit = (data) => {
-    console.log(data);
-  };
-
   return (
     <>
       <PageHeader>
-        <PageTitle text="Create Recipe" />
+        <PageTitle text={`${recipeId ? "Edit" : "Create"} Recipe`} />
       </PageHeader>
       <div className="create-recipe">
         <form className="form" noValidate>
@@ -76,7 +100,7 @@ const CreateRecipePage = () => {
             label="Instructions"
             type="text"
             multiline
-            rows="3"
+            minRows="3"
             autoComplete="off"
             fullWidth
             {...register("instructions", {
@@ -106,11 +130,7 @@ const CreateRecipePage = () => {
                 filled
                 onClick={deletePhotoHandler}
               />
-              <img
-                src={photoPreview}
-                alt="Recipe"
-                className="create-recipe__image"
-              />
+              <Image imageSrc={photoPreview} alt="Recipe photo" />
             </div>
           )}
         </form>

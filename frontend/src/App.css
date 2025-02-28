@@ -25,6 +25,48 @@
     font-style: normal;
 }
 
+.form label, .comment-field label {
+    z-index: 0;
+}
+
+.form label, .form input, .comment-field label, .comment-field input {
+    font-family: "Libre Franklin", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    color: #74796D;
+}
+
+.form input, .comment-field input {
+    color: #141E0C;
+}
+
+.form label.Mui-focused, .comment-field label.Mui-focused {
+    color: #476730;
+}
+
+.form .Mui-underline:after, .comment-field .MuiInput-root:after {
+    border-bottom-color: #476730;
+}
+
+.form .MuiOutlinedInput-root fieldset {
+    border-color: #E0E3E7;
+}
+
+.form .MuiOutlinedInput-root:hover fieldset, .comment-field .MuiInput-root:hover fieldset,
+.form .MuiOutlinedInput-root.Mui-focused fieldset, .comment-field .MuiInput-root.Mui-focused fieldset {
+    border-color: #476730;
+}
+
+@media(min-width: 670px) {
+    .form div.MuiFormControl-root {
+        width: 35rem;
+    }
+
+    .comment-field div.MuiFormControl-root {
+        width: 30rem;
+    }
+}
+
 @media (min-width: 800px) {
     .main {
         padding: 6rem 4rem 1.7rem 4rem;

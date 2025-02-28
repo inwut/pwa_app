@@ -1,7 +1,6 @@
-import React from "react";
-import EditIcon from "@mui/icons-material/Edit";
+import React, { useEffect, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import "./ProfilePage.css";
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
@@ -11,7 +10,9 @@ import Info from "../../common/components/pageElements/Info.jsx";
 import RecipeCardList from "../../recipes/components/RecipeCardList.jsx";
 
 const ProfilePage = () => {
-  const user = {
+  const userId = useParams().userId;
+  const [user, setUser] = useState({ recipes: [] });
+  const testUser = {
     id: 0,
     username: "dariavetrykush",
     followers: 34,
@@ -24,6 +25,7 @@ const ProfilePage = () => {
         title: "Healthy breakfast",
         author: "dariavetrykush",
         likes: 56,
+        isLiked: true,
       },
       {
         id: 2,
@@ -32,6 +34,7 @@ const ProfilePage = () => {
         title: "Salad",
         author: "semytskiy",
         likes: 56,
+        isLiked: false,
       },
       {
         id: 3,
@@ -39,17 +42,35 @@ const ProfilePage = () => {
         title: "Cereal with berries",
         author: "inwut",
         likes: 56,
+        isLiked: true,
       },
     ],
   };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = () => {
+    // api request
+    setUser(testUser);
+  };
+
+  const subscribeHandler = () => {
+    // api request
+  };
+
   return (
     <>
       <PageHeader>
-        <PageTitle text={`@${user.username}`} classNames="profile__username" />
-        {user.id === 0 ? (
-          <Button icon={<EditIcon />} size="large" />
-        ) : (
-          <Button text="Subscribe" type="button" filled size="large" />
+        <PageTitle text={`@${user.username}`} />
+        {user.id !== 0 && (
+          <Button
+            text="Subscribe"
+            filled
+            size="large"
+            onClick={subscribeHandler}
+          />
         )}
       </PageHeader>
       <Info>

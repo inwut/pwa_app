@@ -29,7 +29,9 @@ const IngredientsTable = ({ create, show, rows, onDelete }) => {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  <h3 className="text--heading table__title">Ingredients</h3>
+                  <h3 className="text--heading recipe__section-title">
+                    Ingredients
+                  </h3>
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -39,12 +41,14 @@ const IngredientsTable = ({ create, show, rows, onDelete }) => {
               <TableRow key={id}>
                 <TableCell>{ingredient}</TableCell>
                 <TableCell>{amount}</TableCell>
-                <TableCell>
-                  <Button
-                    icon={<DeleteOutlineIcon />}
-                    onClick={() => onDelete(id)}
-                  />
-                </TableCell>
+                {create && (
+                  <TableCell>
+                    <Button
+                      icon={<DeleteOutlineIcon />}
+                      onClick={() => onDelete(id)}
+                    />
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

@@ -5,7 +5,7 @@ import "./RecipeCard.css";
 import Like from "./LIke.jsx";
 import Info from "../../common/components/pageElements/Info.jsx";
 
-const RecipeCard = ({ id, title, image, author, likes }) => {
+const RecipeCard = ({ id, title, image, author, likes, isLiked }) => {
   return (
     <div className="recipe-card">
       <Link to={`/recipes/${id}`}>
@@ -18,7 +18,7 @@ const RecipeCard = ({ id, title, image, author, likes }) => {
             <span className="recipe-card__author">{author}</span>
           </Info>
         </div>
-        <Like likes={likes} />
+        <Like likes={likes} isLiked={isLiked} recipeId={id} />
       </div>
     </div>
   );

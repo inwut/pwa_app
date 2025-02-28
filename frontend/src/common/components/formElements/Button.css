@@ -5,13 +5,16 @@
     gap: 0.2rem;
 }
 
-.button--filled:disabled {
-    background-color: #C3CEB7;
+.button:disabled {
     pointer-events: none;
 }
 
+.button--filled:disabled {
+    background-color: #C3CEB7;
+}
+
 .button--medium {
-    font-size: 1rem;
+    font-size: 1.1rem;
 }
 
 .button--medium svg {
