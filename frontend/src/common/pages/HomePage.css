@@ -1,0 +1,51 @@
+.home-page {
+    display: flex;
+    flex-direction: column;
+    margin-top: 5rem;
+}
+
+.home-page__title {
+    margin-bottom: 2rem;
+    font-size: 3rem;
+    font-weight: 500;
+    text-align: center;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.home-page__slogan {
+    margin-bottom: 5rem;
+    width: 100%;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.home-page__slogan span {
+    color: #476730;
+}
+
+.home-page__description {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    font-size: 1.3rem;
+    list-style: none;
+}
+
+.home-page__description span {
+    font-weight: 600;
+    color: #476730;
+}
+
+@media (min-width: 600px) {
+    .home-page__title {
+        font-size: 5rem;
+    }
+}
+
+@media (min-width: 800px) {
+    .home-page__description svg {
+        margin: 0 1rem;
+    }
+}
