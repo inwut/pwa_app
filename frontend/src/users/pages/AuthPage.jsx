@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import TextField from "@mui/material/TextField";
 
 import "./AuthPage.css";
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
 import Button from "../../common/components/pageElements/Button.jsx";
+import StyledTextField from "../../common/components/pageElements/StyledTextField.jsx";
 
 const AuthPage = () => {
   const [isSignUpMode, setIsSignUpMode] = useState(true);
@@ -42,7 +42,7 @@ const AuthPage = () => {
         onSubmit={handleSubmit(onSubmit)}
       >
         {isSignUpMode && (
-          <TextField
+          <StyledTextField
             label="Username"
             type="text"
             {...register("username", {
@@ -58,7 +58,7 @@ const AuthPage = () => {
             fullWidth
           />
         )}
-        <TextField
+        <StyledTextField
           label="Email"
           type="email"
           {...register("email", {
@@ -73,7 +73,7 @@ const AuthPage = () => {
           autoComplete="email"
           fullWidth
         />
-        <TextField
+        <StyledTextField
           label="Password"
           type="password"
           {...register("password", {

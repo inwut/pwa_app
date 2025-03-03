@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import PhotoIcon from "@mui/icons-material/Photo";
-import TextField from "@mui/material/TextField";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -13,6 +12,7 @@ import IngredientsForm from "../components/IngredientsForm.jsx";
 import Button from "../../common/components/pageElements/Button.jsx";
 import IngredientsTable from "../components/IngredientsTable.jsx";
 import Image from "../../common/components/pageElements/Image.jsx";
+import StyledTextField from "../../common/components/pageElements/StyledTextField.jsx";
 
 const CreateRecipePage = () => {
   const {
@@ -88,7 +88,7 @@ const CreateRecipePage = () => {
       </PageHeader>
       <div className="create-recipe">
         <form className="form" noValidate>
-          <TextField
+          <StyledTextField
             label="Title"
             type="text"
             autoComplete="off"
@@ -99,7 +99,7 @@ const CreateRecipePage = () => {
             error={!!errors.title}
             helperText={errors.title?.message}
           />
-          <TextField
+          <StyledTextField
             label="Instructions"
             type="text"
             multiline

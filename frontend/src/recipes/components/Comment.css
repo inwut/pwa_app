@@ -4,15 +4,16 @@
     margin: 1rem 0;
 }
 
-.comment__author {
+.comment__info-section {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    flex-wrap: wrap;
     color: #74796D;
 }
 
 .comment__text {
-    margin-top: 0.5rem;
+    margin-top: 0.7rem;
     max-width: 35rem;
 }
 
@@ -24,33 +25,6 @@
     display: flex;
     gap: 1rem;
     margin-top: 0.3rem;
-}
-
-.comment__reply label, .comment__reply input {
-    font-family: "Libre Franklin", serif;
-    font-optical-sizing: auto;
-    font-style: normal;
-    color: #74796D;
-}
-
-.comment__reply label {
-    z-index: 0;
-}
-
-.comment__reply input {
-    color: #141E0C;
-}
-
-.comment__reply label.Mui-focused {
-    color: #74796D;
-}
-
-.comment__reply .MuiInput-root:after {
-    border-bottom-color: #74796D;
-}
-
-.comment__reply .MuiInput-root:hover fieldset, .comment__reply .MuiInput-root.Mui-focused fieldset {
-    border-color: #74796D;
 }
 
 @media(min-width: 670px) {

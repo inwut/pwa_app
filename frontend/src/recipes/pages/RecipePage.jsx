@@ -3,7 +3,6 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import SendIcon from "@mui/icons-material/Send";
-import TextField from "@mui/material/TextField";
 import Modal from "@mui/material/Modal";
 
 import "./RecipePage.css";
@@ -15,6 +14,7 @@ import Like from "../components/Like.jsx";
 import Image from "../../common/components/pageElements/Image.jsx";
 import IngredientsTable from "../components/IngredientsTable.jsx";
 import Comment from "../components/Comment.jsx";
+import StyledTextField from "../../common/components/pageElements/StyledTextField.jsx";
 
 const RecipePage = () => {
   const navigate = useNavigate();
@@ -30,6 +30,7 @@ const RecipePage = () => {
   const testRecipe = {
     id: 1,
     isLiked: true,
+    created_at: "2025-1-12 13:00",
     name: "Healthy breakfast",
     image:
       "https://wallpapers.com/images/hd/aesthetic-food-pictures-yw84jpuaeol0h8vh.jpg",
@@ -49,32 +50,38 @@ const RecipePage = () => {
       {
         id: 1,
         text: "Lorem ipsum dolor sit amet.",
-        author: { id: 1, username: "1" },
+        created_at: "2025-1-12 13:00",
+        author: { id: 1, username: "dariavetrykush" },
         responses: [
           {
             id: 2,
             text: 'The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.',
-            author: { id: 2, username: "1.1" },
+            created_at: "2025-1-12 13:00",
+            author: { id: 2, username: "ssemytskiy" },
           },
         ],
       },
       {
         id: 3,
         text: "Lorem ipsum dolor sit amet, consectetur adipiscing.",
+        created_at: "2025-1-12 13:00",
         author: { id: 1, username: "2" },
         responses: [
           {
             id: 4,
             text: "Lorem ipsum.",
+            created_at: "2025-1-12 13:00",
             author: { id: 2, username: "2.1" },
           },
           {
             id: 5,
             text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam ut.",
+            created_at: "2025-1-12 13:00",
             author: { id: 2, username: "2.2" },
             responses: [
               {
                 id: 6,
+                created_at: "2025-1-12 13:00",
                 text: 'The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.',
                 author: { id: 2, username: "2.2.1" },
               },
@@ -164,6 +171,7 @@ const RecipePage = () => {
         <Link to={`/profile/${recipe.author.id}`}>
           <Button text={`@${recipe.author.username}`} size="large" />
         </Link>
+        <span>{recipe.created_at}</span>
       </Info>
       <Image
         imageSrc={recipe.image}
@@ -182,7 +190,7 @@ const RecipePage = () => {
       </h3>
       <section>
         <div className="comment-field">
-          <TextField
+          <StyledTextField
             label="Comment"
             type="text"
             autoComplete="off"

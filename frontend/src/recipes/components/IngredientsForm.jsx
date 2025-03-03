@@ -1,8 +1,8 @@
 import React from "react";
-import TextField from "@mui/material/TextField";
 import { useForm } from "react-hook-form";
 
 import Button from "../../common/components/pageElements/Button.jsx";
+import StyledTextField from "../../common/components/pageElements/StyledTextField.jsx";
 
 const IngredientsForm = ({ onAdd, ingredients }) => {
   const {
@@ -21,7 +21,7 @@ const IngredientsForm = ({ onAdd, ingredients }) => {
 
   return (
     <form className="form" noValidate onSubmit={handleSubmit(onSubmit)}>
-      <TextField
+      <StyledTextField
         label="Ingredient"
         type="text"
         autoComplete="off"
@@ -35,7 +35,7 @@ const IngredientsForm = ({ onAdd, ingredients }) => {
         error={!!errors.ingredient}
         helperText={errors.ingredient?.message}
       />
-      <TextField
+      <StyledTextField
         label="Amount"
         type="text"
         autoComplete="off"

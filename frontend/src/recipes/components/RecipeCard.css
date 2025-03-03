@@ -21,7 +21,6 @@
     transition: transform 0.3s ease-in-out;
 }
 
-
 .recipe-card__info {
     display: flex;
     justify-content: space-between;
