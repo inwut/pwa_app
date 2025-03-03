@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useDebounce } from "use-debounce";
 import { useParams } from "react-router-dom";
 
 import UserCardList from "../components/UserCardList.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import SearchField from "../../common/components/pageElements/SearchField.jsx";
+import useSearchInput from "../../common/hooks/useSearchInput.js";
 
 const UsersPage = ({ type }) => {
   const userId = useParams().userId;
   const [users, setUsers] = useState([]);
-  const [searchInput, setSearchInput] = useState("");
-  const [debouncedSearchInput] = useDebounce(searchInput, 1000);
+  const { searchInput, setSearchInput, debouncedSearchInput } =
+    useSearchInput();
 
   const testUsers = [
     {
@@ -35,10 +35,10 @@ const UsersPage = ({ type }) => {
   ];
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsersData();
   }, [debouncedSearchInput]);
 
-  const fetchUsers = () => {
+  const fetchUsersData = () => {
     if (type === "following") {
       // api request to userId following
     } else if (type === "followers") {
@@ -52,13 +52,7 @@ const UsersPage = ({ type }) => {
   return (
     <>
       <PageHeader>
-        {type === "following" ? (
-          <PageTitle text="Following" />
-        ) : type === "followers" ? (
-          <PageTitle text="Followers" />
-        ) : (
-          <PageTitle text="Users" />
-        )}
+        <PageTitle text={type.charAt(0).toUpperCase() + type.slice(1)} />
         <div className="page-header__toolbar">
           <SearchField
             value={searchInput}

@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 import "./RecipeCard.css";
-import Like from "./LIke.jsx";
+import Like from "./Like.jsx";
 import Info from "../../common/components/pageElements/Info.jsx";
 
 const RecipeCard = ({ id, title, image, author, likes, isLiked }) => {

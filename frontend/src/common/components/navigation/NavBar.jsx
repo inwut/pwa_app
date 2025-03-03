@@ -7,16 +7,16 @@ import "./NavBar.css";
 import NavLinks from "./NavLinks.jsx";
 
 const NavBar = () => {
-  const [openNav, setOpenNav] = useState(false);
-  const [navRendered, setNavRendered] = useState(false);
+  const [isNavOpened, setIsNavOpened] = useState(false);
+  const [hasNavRendered, setHasNavRendered] = useState(false);
 
   const toggleMenuHandler = () => {
-    if (openNav) {
-      setOpenNav(false);
-      setTimeout(() => setNavRendered(false), 300);
+    if (isNavOpened) {
+      setIsNavOpened(false);
+      setTimeout(() => setHasNavRendered(false), 300);
     } else {
-      setNavRendered(true);
-      setTimeout(() => setOpenNav(true), 10);
+      setHasNavRendered(true);
+      setTimeout(() => setIsNavOpened(true), 10);
     }
   };
 
@@ -26,10 +26,10 @@ const NavBar = () => {
         <Link to="/">Recipegram</Link>
       </h1>
       <button className="header__menu-button" onClick={toggleMenuHandler}>
-        {openNav ? <CloseIcon /> : <MenuIcon />}
+        {isNavOpened ? <CloseIcon /> : <MenuIcon />}
       </button>
       <nav
-        className={`nav ${navRendered && "nav--visible"} ${openNav && "nav--opened"}`}
+        className={`nav ${hasNavRendered && "nav--visible"} ${isNavOpened && "nav--opened"}`}
       >
         <NavLinks onLinkCLick={toggleMenuHandler} />
       </nav>

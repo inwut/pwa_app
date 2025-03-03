@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import "./ProfilePage.css";
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
-import Button from "../../common/components/formElements/Button.jsx";
+import Button from "../../common/components/pageElements/Button.jsx";
 import Info from "../../common/components/pageElements/Info.jsx";
 import RecipeCardList from "../../recipes/components/RecipeCardList.jsx";
 
@@ -48,10 +48,10 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    fetchUser();
+    fetchUserData();
   }, []);
 
-  const fetchUser = () => {
+  const fetchUserData = () => {
     // api request
     setUser(testUser);
   };

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import TextField from "@mui/material/TextField";
 
 import "./AuthPage.css";
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
-import Button from "../../common/components/formElements/Button.jsx";
-import TextField from "@mui/material/TextField";
+import Button from "../../common/components/pageElements/Button.jsx";
 
 const AuthPage = () => {
-  const [signUpMode, setSignUpMode] = useState(true);
+  const [isSignUpMode, setIsSignUpMode] = useState(true);
   const {
     register,
     handleSubmit,
@@ -19,12 +19,12 @@ const AuthPage = () => {
   });
 
   const switchModeHandler = () => {
-    setSignUpMode((prevState) => !prevState);
+    setIsSignUpMode((prevState) => !prevState);
     unregister("username");
   };
 
   const onSubmit = (data) => {
-    if (signUpMode) {
+    if (isSignUpMode) {
       // api request sign up
     } else {
       // api request log in
@@ -34,14 +34,14 @@ const AuthPage = () => {
   return (
     <>
       <PageHeader>
-        <PageTitle text={signUpMode ? "Sign Up" : "Log In"} />
+        <PageTitle text={isSignUpMode ? "Sign Up" : "Log In"} />
       </PageHeader>
       <form
         className="form form--auth"
         noValidate
         onSubmit={handleSubmit(onSubmit)}
       >
-        {signUpMode && (
+        {isSignUpMode && (
           <TextField
             label="Username"
             type="text"
@@ -85,12 +85,12 @@ const AuthPage = () => {
           })}
           error={!!errors.password}
           helperText={errors.password?.message}
-          autoComplete={signUpMode ? "new-password" : "off"}
+          autoComplete={isSignUpMode ? "new-password" : "off"}
           fullWidth
         />
         <Button
           classNames="form__auth-button"
-          text={signUpMode ? "Sign Up" : "Log In"}
+          text={isSignUpMode ? "Sign Up" : "Log In"}
           size="large"
           type="submit"
           filled
@@ -98,7 +98,7 @@ const AuthPage = () => {
         />
         <Button
           classNames="form__switch-button"
-          text={`Switch to ${signUpMode ? "Log In" : "Sign Up"}`}
+          text={`Switch to ${isSignUpMode ? "Log In" : "Sign Up"}`}
           type="button"
           onClick={switchModeHandler}
         />

@@ -11,26 +11,6 @@
     background-color: #F9FAEF;
 }
 
-.nav {
-    position: relative;
-    z-index: 2;
-    display: none;
-    width: 100%;
-    padding-top: 2rem;
-    opacity: 0;
-    transform: translateY(-2rem);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.nav--opened {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.nav--visible {
-    display: flex;
-}
-
 .header__logo a {
     font-size: 2rem;
     font-family: "Newsreader", serif;
@@ -48,6 +28,27 @@
     color: #141E0C;
     font-size: 2rem;
 }
+
+.nav {
+    position: relative;
+    z-index: 2;
+    display: none;
+    width: 100%;
+    padding-top: 2rem;
+    opacity: 0;
+    transform: translateY(-2rem);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.nav--visible {
+    display: flex;
+}
+
+.nav--opened {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 
 @media (min-width: 800px) {
     .header {

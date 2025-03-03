@@ -9,7 +9,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { Paper } from "@mui/material";
 
 import "./IngredientsTable.css";
-import Button from "../../common/components/formElements/Button.jsx";
+import Button from "../../common/components/pageElements/Button.jsx";
 
 const IngredientsTable = ({ create, show, rows, onDelete }) => {
   return (

@@ -6,14 +6,14 @@ import SearchField from "../../common/components/pageElements/SearchField.jsx";
 import CheckBox from "../../common/components/pageElements/CheckBox.jsx";
 import ProductsAutocomplete from "../components/ProductsAutocomplete.jsx";
 import RecipeCardList from "../components/RecipeCardList.jsx";
-import { useDebounce } from "use-debounce";
+import useSearchInput from "../../common/hooks/useSearchInput.js";
 
 const RecipesPage = () => {
   const [recipes, setRecipes] = useState([]);
-  const [searchInput, setSearchInput] = useState("");
-  const [debouncedSearchInput] = useDebounce(searchInput, 1000);
-  const [onlyFollowing, setOnlyFollowing] = useState(false);
+  const [isOnlyFollowing, setIsOnlyFollowing] = useState(false);
   const [ingredients, setIngredients] = useState([]);
+  const { searchInput, setSearchInput, debouncedSearchInput } =
+    useSearchInput();
 
   const testRecipes = [
     {
@@ -45,16 +45,16 @@ const RecipesPage = () => {
   ];
 
   useEffect(() => {
-    fetchRecipes();
-  }, [debouncedSearchInput, onlyFollowing, ingredients]);
+    fetchRecipesData();
+  }, [debouncedSearchInput, isOnlyFollowing, ingredients]);
 
-  const fetchRecipes = () => {
+  const fetchRecipesData = () => {
     // api request
     setRecipes(testRecipes);
   };
 
   const toggleCheckBoxHandler = () => {
-    setOnlyFollowing((prevState) => !prevState);
+    setIsOnlyFollowing((prevState) => !prevState);
   };
 
   const changeIngredientsHandler = (data) => {
@@ -74,7 +74,7 @@ const RecipesPage = () => {
           <CheckBox
             label="Only following"
             onCheck={toggleCheckBoxHandler}
-            checked={onlyFollowing}
+            checked={isOnlyFollowing}
           />
         </div>
       </PageHeader>

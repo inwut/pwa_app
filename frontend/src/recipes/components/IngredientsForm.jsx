@@ -1,7 +1,8 @@
 import React from "react";
 import TextField from "@mui/material/TextField";
-import Button from "../../common/components/formElements/Button.jsx";
 import { useForm } from "react-hook-form";
+
+import Button from "../../common/components/pageElements/Button.jsx";
 
 const IngredientsForm = ({ onAdd, ingredients }) => {
   const {

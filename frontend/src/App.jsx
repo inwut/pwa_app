@@ -35,7 +35,7 @@ function App() {
           <Route path="favorites" element={<FavoritesPage />} />
           <Route path="auth" element={<AuthPage />} />
           <Route path="profile/:userId" element={<ProfilePage />} />
-          <Route path="users" element={<UsersPage />} />
+          <Route path="users" element={<UsersPage type="users" />} />
           <Route
             path="profile/:userId/following"
             element={<UsersPage type="following" />}

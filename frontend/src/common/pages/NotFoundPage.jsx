@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 import "./NotFoundPage.css";
-import Button from "../components/formElements/Button.jsx";
+import Button from "../components/pageElements/Button.jsx";
 
 const NotFoundPage = () => {
   return (

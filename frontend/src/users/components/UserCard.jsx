@@ -1,8 +1,8 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 import "./UserCard.css";
 import Info from "../../common/components/pageElements/Info.jsx";
-import { Link } from "react-router-dom";
 
 const UserCard = ({ id, username, recipes, followers }) => {
   return (

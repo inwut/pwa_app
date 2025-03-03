@@ -10,7 +10,7 @@ import "./CreateRecipePage.css";
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
 import IngredientsForm from "../components/IngredientsForm.jsx";
-import Button from "../../common/components/formElements/Button.jsx";
+import Button from "../../common/components/pageElements/Button.jsx";
 import IngredientsTable from "../components/IngredientsTable.jsx";
 import Image from "../../common/components/pageElements/Image.jsx";
 
@@ -25,25 +25,28 @@ const CreateRecipePage = () => {
   });
 
   const recipeId = useParams().recipeId;
-
   const [ingredients, setIngredients] = useState([]);
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState("");
 
   useEffect(() => {
     if (recipeId) {
-      // api request
-      setValue("title", "Healthy breakfast", { shouldValidate: true });
-      setValue("instructions", "Instructions", {
-        shouldValidate: true,
-      });
-      setPhoto("PHOTO");
-      setPhotoPreview(
-        "https://wallpapers.com/images/hd/aesthetic-food-pictures-yw84jpuaeol0h8vh.jpg",
-      );
-      setIngredients([{ id: 1, ingredient: "bread", amount: "2" }]);
+      fetchRecipeData();
     }
   }, []);
+
+  const fetchRecipeData = () => {
+    // api request
+    setValue("title", "Healthy breakfast", { shouldValidate: true });
+    setValue("instructions", "Instructions", {
+      shouldValidate: true,
+    });
+    setPhoto("PHOTO");
+    setPhotoPreview(
+      "https://wallpapers.com/images/hd/aesthetic-food-pictures-yw84jpuaeol0h8vh.jpg",
+    );
+    setIngredients([{ id: 1, ingredient: "bread", amount: "2" }]);
+  };
 
   const onSubmit = (data) => {
     if (recipeId) {

@@ -10,8 +10,8 @@ import "./RecipePage.css";
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
 import Info from "../../common/components/pageElements/Info.jsx";
-import Button from "../../common/components/formElements/Button.jsx";
-import Like from "../components/LIke.jsx";
+import Button from "../../common/components/pageElements/Button.jsx";
+import Like from "../components/Like.jsx";
 import Image from "../../common/components/pageElements/Image.jsx";
 import IngredientsTable from "../components/IngredientsTable.jsx";
 import Comment from "../components/Comment.jsx";
@@ -25,9 +25,9 @@ const RecipePage = () => {
     ingredients: [],
   });
   const [comment, setComment] = useState("");
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  let testRecipe = {
+  const testRecipe = {
     id: 1,
     isLiked: true,
     name: "Healthy breakfast",
@@ -86,10 +86,10 @@ const RecipePage = () => {
   };
 
   useEffect(() => {
-    fetchRecipe();
+    fetchRecipeData();
   }, []);
 
-  const fetchRecipe = () => {
+  const fetchRecipeData = () => {
     //api request
     setRecipe(testRecipe);
   };
@@ -104,11 +104,11 @@ const RecipePage = () => {
   };
 
   const openDeleteModalHandler = () => {
-    setOpenDeleteModal(true);
+    setShowDeleteModal(true);
   };
 
   const closeDeleteModalHandler = () => {
-    setOpenDeleteModal(false);
+    setShowDeleteModal(false);
   };
 
   const countComments = (comments) => {
@@ -127,15 +127,15 @@ const RecipePage = () => {
 
   return (
     <>
-      <Modal open={openDeleteModal} onClose={closeDeleteModalHandler}>
+      <Modal open={showDeleteModal} onClose={closeDeleteModalHandler}>
         <div className="recipe__modal">
           <p className="text--primary recipe__modal-text">
             Are you sure you want to delete this recipe?
           </p>
-          <Info>
+          <div className="recipe__modal-buttons">
             <Button text="Delete" filled onClick={deleteRecipeHandler} />
             <Button text="Cancel" onClick={closeDeleteModalHandler} />
-          </Info>
+          </div>
         </div>
       </Modal>
       <PageHeader>

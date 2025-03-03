@@ -4,7 +4,7 @@ import TextField from "@mui/material/TextField";
 import ReplyIcon from "@mui/icons-material/Reply";
 
 import "./Comment.css";
-import Button from "../../common/components/formElements/Button.jsx";
+import Button from "../../common/components/pageElements/Button.jsx";
 
 const Comment = ({ parent, comment }) => {
   const [reply, setReply] = useState("");

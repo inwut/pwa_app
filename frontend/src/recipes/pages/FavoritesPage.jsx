@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useDebounce } from "use-debounce";
 
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
 import SearchField from "../../common/components/pageElements/SearchField.jsx";
 import RecipeCardList from "../components/RecipeCardList.jsx";
+import useSearchInput from "../../common/hooks/useSearchInput.js";
 
 const FavoritesPage = () => {
   const [recipes, setRecipes] = useState([]);
-  const [searchInput, setSearchInput] = useState("");
-  const [debouncedSearchInput] = useDebounce(searchInput, 1000);
+  const { searchInput, setSearchInput, debouncedSearchInput } =
+    useSearchInput();
 
   const testRecipes = [
     {
@@ -41,10 +41,10 @@ const FavoritesPage = () => {
   ];
 
   useEffect(() => {
-    fetchRecipes();
+    fetchRecipesData();
   }, [debouncedSearchInput]);
 
-  const fetchRecipes = () => {
+  const fetchRecipesData = () => {
     // api request
     setRecipes(testRecipes);
   };
