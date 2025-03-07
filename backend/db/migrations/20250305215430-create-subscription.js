@@ -40,15 +40,6 @@ module.exports = {
       type: 'unique',
       name: 'unique_subscription'
     });
-
-    await queryInterface.addConstraint('subscription', {
-      fields: ['userId', 'subscriberId'],
-      type: 'check',
-      where: {
-        userId: { [Sequelize.Op.ne]: Sequelize.col('subscriberId') }
-      },
-      name: 'user_cannot_subscribe_to_themselves'
-    });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('subscription');

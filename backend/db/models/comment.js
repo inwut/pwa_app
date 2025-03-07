@@ -1,8 +1,10 @@
 'use strict';
 const {  DataTypes} = require('sequelize');
+
 const { sequelize } = require('../../config/database');
 const user = require('../models/user');
 const recipe = require('../models/recipe');
+const AppError = require("../../utils/appError");
 
 const comment = sequelize.define('comment', {
   id: {
@@ -33,7 +35,14 @@ const comment = sequelize.define('comment', {
 }, {
   freezeTableName: true,
   timestamps: true,
-  updatedAt: false
+  updatedAt: false,
+  validate: {
+    checkRecipeOrResponse() {
+      if (!this.recipeId && !this.commentId) {
+        throw new AppError('At least one of recipeId or commentId must be provided');
+      }
+    }
+  }
 });
 
 comment.belongsTo(user, {

@@ -1,10 +1,19 @@
 'use strict';
 const { sequelize } = require('../../config/database');
 
+const AppError = require("../../utils/appError");
+
 const subscription = sequelize.define('subscription', {}, {
     freezeTableName: true,
     timestamps: true,
-    updatedAt: false
+    updatedAt: false,
+    validate: {
+        userNotSameAsSubscriber() {
+            if (this.userId === this.subscriberId) {
+                throw new AppError('A user cannot subscribe to themselves', 400);
+            }
+        }
+    }
 });
 
 module.exports = subscription;

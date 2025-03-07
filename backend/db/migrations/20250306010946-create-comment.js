@@ -46,18 +46,6 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
-
-    await queryInterface.addConstraint('comment', {
-      fields: ['recipeId', 'commentId'],
-      type: 'check',
-      where: {
-        [Sequelize.Op.or]: [
-          { commentId: { [Sequelize.Op.is]: null } },
-          { recipeId: { [Sequelize.Op.is]: null } }
-        ]
-      },
-      name: 'check_recipe_or_response'
-    });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('comment');
