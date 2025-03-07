@@ -1,5 +1,5 @@
 'use strict';
-const sequelize = require('../../config/database');
+const { sequelize } = require('../../config/database');
 
 const subscription = sequelize.define('subscription', {}, {
     freezeTableName: true,

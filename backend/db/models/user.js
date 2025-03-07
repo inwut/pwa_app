@@ -1,9 +1,9 @@
 'use strict';
 const {  DataTypes} = require('sequelize');
-const sequelize = require('../../config/database');
+const { sequelize } = require('../../config/database');
 const subscription = require('../models/subscription');
 
-const user = sequelize.define('user', {
+const User = sequelize.define('user', {
   id: {
     allowNull: false,
     autoIncrement: true,
@@ -43,18 +43,18 @@ const user = sequelize.define('user', {
   timestamps: false,
 });
 
-user.belongsToMany(user,{
+User.belongsToMany(User,{
   through: subscription,
   foreignKey: 'userId',
   otherKey: 'subscriberId',
   as: 'subscriptions',
 });
 
-user.belongsToMany(user,{
+User.belongsToMany(User,{
   through: subscription,
   foreignKey: 'subscriberId',
   otherKey: 'userId',
   as: 'subscribers',
 });
 
-module.exports = user;
+module.exports = User;

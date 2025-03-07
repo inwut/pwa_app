@@ -1,6 +1,6 @@
 'use strict';
 const { DataTypes } = require('sequelize');
-const sequelize = require('../../config/database');
+const { sequelize } = require('../../config/database');
 const recipe = require('../models/recipe');
 
 const ingredient = sequelize.define('ingredient', {
@@ -31,12 +31,6 @@ const ingredient = sequelize.define('ingredient', {
   recipeId: {
     allowNull: false,
     type: DataTypes.INTEGER,
-    references: {
-      model: recipe,
-      key: 'id',
-    },
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
   }
 }, {
   freezeTableName: true,
@@ -45,15 +39,11 @@ const ingredient = sequelize.define('ingredient', {
 
 recipe.hasMany(ingredient, {
   foreignKey: 'recipeId',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
   as: 'ingredients'
 });
 
 ingredient.belongsTo(recipe, {
   foreignKey: 'recipeId',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
   as: 'recipe'
 });
 

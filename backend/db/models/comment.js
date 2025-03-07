@@ -1,6 +1,6 @@
 'use strict';
 const {  DataTypes} = require('sequelize');
-const sequelize = require('../../config/database');
+const { sequelize } = require('../../config/database');
 const user = require('../models/user');
 const recipe = require('../models/recipe');
 
@@ -23,30 +23,12 @@ const comment = sequelize.define('comment', {
   authorId: {
     allowNull: false,
     type: DataTypes.INTEGER,
-    references: {
-      model: 'user',
-      key: 'id',
-    },
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
   },
   recipeId: {
     type: DataTypes.INTEGER,
-    references: {
-      model: 'recipe',
-      key: 'id',
-    },
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
   },
   commentId: {
     type: DataTypes.INTEGER,
-    references: {
-      model: 'comment',
-      key: 'id',
-    },
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
   },
 }, {
   freezeTableName: true,
@@ -56,43 +38,31 @@ const comment = sequelize.define('comment', {
 
 comment.belongsTo(user, {
   foreignKey: 'authorId',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
   as: 'author',
 });
 
 comment.belongsTo(recipe, {
   foreignKey: 'recipeId',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
   as: 'recipe',
 });
 
 comment.belongsTo(comment, {
   foreignKey: 'commentId',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
   as: 'responseToComment',
 });
 
 user.hasMany(comment, {
   foreignKey: 'authorId',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
   as: 'comments',
 });
 
 recipe.hasMany(comment, {
   foreignKey: 'recipeId',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
   as: 'comments'
 });
 
 comment.hasMany(comment, {
   foreignKey: 'commentId',
-  onDelete: 'CASCADE',
-  onUpdate: 'CASCADE',
   as: 'responses'
 });
 
