@@ -43,7 +43,7 @@ const recipe = sequelize.define('recipe', {
 
 user.hasMany(recipe, {
   foreignKey: 'authorId',
-  as: 'recipes',
+  as: 'createdRecipes',
 });
 recipe.belongsTo(user, {
   foreignKey: 'authorId',
