@@ -1,6 +1,6 @@
 "use strict";
-const { sequelize } = require("../../config/database");
 
+const { sequelize } = require("../../config/database");
 const AppError = require("../../utils/appError");
 
 const Subscription = sequelize.define(

@@ -81,7 +81,7 @@ Comment.addScope("withAuthor", {
       attributes: ["id", "username"],
     },
   ],
-  order: [["id", "ASC"]],
+  order: [["createdAt", "DESC"]],
 });
 
 module.exports = Comment;

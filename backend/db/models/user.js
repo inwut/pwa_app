@@ -1,5 +1,5 @@
 "use strict";
-const { DataTypes } = require("sequelize");
+const { DataTypes, literal } = require("sequelize");
 const { sequelize } = require("../../config/database");
 const Subscription = require("../models/subscription");
 
@@ -59,6 +59,25 @@ User.belongsToMany(User, {
   foreignKey: "subscriberId",
   otherKey: "userId",
   as: "subscriptions",
+});
+
+User.addScope("withLikesAndFollowersCount", {
+  attributes: [
+    "id",
+    "username",
+    [
+      literal(
+        `(SELECT COUNT(*) FROM "recipe" WHERE "recipe"."authorId" = "user"."id")`,
+      ),
+      "recipeCount",
+    ],
+    [
+      literal(
+        `(SELECT COUNT(*) FROM "subscription" WHERE "subscription"."userId" = "user"."id")`,
+      ),
+      "followersCount",
+    ],
+  ],
 });
 
 module.exports = User;

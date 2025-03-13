@@ -1,3 +1,5 @@
+const { literal, Op } = require("sequelize");
+
 const AppError = require("../utils/appError");
 const callDbHandler = require("../utils/callDbHandler");
 const Recipe = require("../db/models/recipe");
@@ -6,27 +8,19 @@ const User = require("../db/models/user");
 const Comment = require("../db/models/comment");
 const Subscription = require("../db/models/subscription");
 const Like = require("../db/models/like");
-const { literal, Op } = require("sequelize");
 
-const getCommentsByRecipeId = async (recipeId) => {
-  const comments = await callDbHandler(() =>
-    Comment.scope("withAuthor").findAll({
-      attributes: ["commentId", "recipeId"],
-      where: { recipeId },
-    }),
-  );
-
+const formatComments = async (comments) => {
   const plainComments = comments.map((c) => c.toJSON());
   if (!plainComments.length) return [];
 
   const commentMap = new Map();
-  const topLevelComments = [];
+  const responseData = [];
 
   plainComments.forEach((comment) => {
     comment.responses = [];
     commentMap.set(comment.id, comment);
     if (!comment.commentId) {
-      topLevelComments.push(comment);
+      responseData.push(comment);
     }
   });
 
@@ -43,13 +37,15 @@ const getCommentsByRecipeId = async (recipeId) => {
     }
   });
 
-  const cleanData = (comments) =>
+  const cleanCommentsData = (comments) =>
     comments.map(({ commentId, recipeId, responses, ...rest }) => ({
       ...rest,
-      responses: cleanData(responses),
+      responses: responses
+        .map(({ commentId, recipeId, responses, ...rest }) => ({ ...rest }))
+        .sort((a, b) => a.id - b.id),
     }));
 
-  return cleanData(topLevelComments);
+  return cleanCommentsData(responseData);
 };
 
 const getRecipeById = async (req, res) => {
@@ -79,13 +75,19 @@ const getRecipeById = async (req, res) => {
   }
 
   const likesCount = await callDbHandler(() => recipe.countLikes());
-  const commentsWithResponses = await getCommentsByRecipeId(recipeId);
+  const comments = await callDbHandler(() =>
+    Comment.scope("withAuthor").findAll({
+      attributes: ["commentId", "recipeId"],
+      where: { recipeId },
+    }),
+  );
+  const formattedComments = await formatComments(comments);
 
   let responseData = {
     recipe: {
       ...recipe.toJSON(),
       likesCount,
-      comments: commentsWithResponses,
+      comments: formattedComments,
     },
   };
 
@@ -113,6 +115,7 @@ const getRecipes = async (req, res) => {
       }),
     );
     followedUsersIds = subscriptions.map((sub) => sub.userId);
+
     if (followedUsersIds.length === 0) {
       return res.status(200).json([]);
     }
@@ -159,11 +162,12 @@ const getRecipes = async (req, res) => {
 
 const deleteRecipe = async (req, res) => {
   const recipeId = req.params.id;
-  const authUserId = req.user?.id;
-  const isAdmin = req.user?.role === "admin";
+  const authUserId = req.user.id;
+  const isAdmin = req.user.role === "admin";
 
   const recipe = await callDbHandler(() =>
     Recipe.findByPk(recipeId, {
+      attributes: ["id", "name"],
       include: [{ model: User, as: "author", attributes: ["id"] }],
     }),
   );
@@ -177,7 +181,6 @@ const deleteRecipe = async (req, res) => {
   }
 
   await callDbHandler(() => recipe.destroy());
-
   res.status(200).json({ message: "Recipe deleted successfully" });
 };
 
@@ -223,6 +226,7 @@ const getLikedRecipes = async (req, res) => {
 
   const recipes = await callDbHandler(() =>
     Recipe.scope("withAuthorAndLikesCount").findAll({
+      attributes: [[literal("true"), "isLiked"]],
       include: [
         {
           model: User,

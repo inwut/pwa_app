@@ -1,11 +1,11 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { Op, literal, col } = require("sequelize");
 
 const User = require("../db/models/user");
 const Recipe = require("../db/models/recipe");
 const AppError = require("../utils/appError");
 const callDbHandler = require("../utils/callDbHandler");
-const { Op, literal, fn, col } = require("sequelize");
 
 const generateToken = (user) => {
   return jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
@@ -54,25 +54,9 @@ const getUsers = async (req, res) => {
   const { search } = req.query;
 
   const users = await callDbHandler(() =>
-    User.findAll({
-      attributes: [
-        "id",
-        "username",
-        [
-          literal(
-            `(SELECT COUNT(*) FROM "recipe" WHERE "recipe"."authorId" = "user"."id")`,
-          ),
-          "recipeCount",
-        ],
-        [
-          literal(
-            `(SELECT COUNT(*) FROM "subscription" WHERE "subscription"."userId" = "user"."id")`,
-          ),
-          "followersCount",
-        ],
-      ],
+    User.scope("withLikesAndFollowersCount").findAll({
       where: search ? { username: { [Op.iLike]: `%${search}%` } } : {},
-      order: [[literal('"followersCount"'), "DESC"]],
+      order: [[col("followersCount"), "DESC"]],
     }),
   );
 
@@ -86,43 +70,33 @@ const getUserById = async (req, res) => {
   const user = await callDbHandler(() =>
     User.findByPk(userId, {
       attributes: ["id", "username"],
-      include: [
-        {
-          model: Recipe,
-          as: "createdRecipes",
-          attributes: [
-            "id",
-            "name",
-            "image",
-            [fn("COUNT", col("createdRecipes->likes.id")), "likesCount"],
-            authUserId
-              ? [
-                  literal(
-                    `EXISTS (SELECT 1 FROM "like" 
-                  WHERE "like"."recipeId" = "createdRecipes"."id" 
-                  AND "like"."userId" = ${authUserId})`,
-                  ),
-                  "isLiked",
-                ]
-              : [literal("false"), "isLiked"],
-          ],
-          include: [
-            {
-              model: User,
-              as: "likes",
-              attributes: [],
-              through: { attributes: [] },
-            },
-          ],
-        },
-      ],
-      group: ["user.id", "createdRecipes.id"],
     }),
   );
 
   if (!user) {
     throw new AppError("User not found", 404);
   }
+
+  const recipes = await callDbHandler(() =>
+    Recipe.scope("withAuthorAndLikesCount").findAll({
+      attributes: [
+        authUserId
+          ? [
+              literal(
+                `EXISTS (SELECT 1 FROM "like" 
+                  WHERE "like"."recipeId" = "recipe"."id" 
+                  AND "like"."userId" = ${authUserId})`,
+              ),
+              "isLiked",
+            ]
+          : [literal("false"), "isLiked"],
+      ],
+      where: {
+        authorId: userId,
+      },
+      order: [["createdAt", "DESC"]],
+    }),
+  );
 
   const [followersCount, followingCount] = await Promise.all([
     callDbHandler(() => user.countSubscribers()),
@@ -132,6 +106,7 @@ const getUserById = async (req, res) => {
   let responseData = {
     user: {
       ...user.toJSON(),
+      recipes,
       followersCount,
       followingCount,
     },
@@ -146,24 +121,9 @@ const getUserById = async (req, res) => {
   res.status(200).json(responseData);
 };
 
-const getUserFollowsQueryConfig = (search) => {
+const getUserFollowsQuery = (search) => {
   return {
-    attributes: [
-      "id",
-      "username",
-      [
-        literal(
-          `(SELECT COUNT(*) FROM "recipe" WHERE "recipe"."authorId" = "user"."id")`,
-        ),
-        "recipesCount",
-      ],
-      [
-        literal(
-          `(SELECT COUNT(*) FROM "subscription" WHERE "subscription"."userId" = "user"."id")`,
-        ),
-        "followersCount",
-      ],
-    ],
+    ...User.options.scopes.withLikesAndFollowersCount,
     joinTableAttributes: [],
     where: search ? { username: { [Op.iLike]: `%${search}%` } } : {},
     order: [[col("subscription.createdAt"), "DESC"]],
@@ -180,7 +140,7 @@ const getUserFollowing = async (req, res) => {
   }
 
   const following = await callDbHandler(() =>
-    user.getSubscriptions(getUserFollowsQueryConfig(search)),
+    user.getSubscriptions(getUserFollowsQuery(search)),
   );
   res.status(200).json({ following });
 };
@@ -195,7 +155,7 @@ const getUserFollowers = async (req, res) => {
   }
 
   const followers = await callDbHandler(() =>
-    user.getSubscribers(getUserFollowsQueryConfig(search)),
+    user.getSubscribers(getUserFollowsQuery(search)),
   );
   res.status(200).json({ followers: followers });
 };
