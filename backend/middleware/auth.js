@@ -29,4 +29,16 @@ const optionalAuth = (req, res, next) => {
   })(req, res, next);
 };
 
-module.exports = { auth, optionalAuth };
+const restrictByRole = (roleType) => {
+  return (req, res, next) => {
+    const { role } = req.user;
+    if (role !== roleType) {
+      return next(
+        new AppError("You don't have permission to perform this action", 403),
+      );
+    }
+    next();
+  };
+};
+
+module.exports = { auth, optionalAuth, restrictByRole };

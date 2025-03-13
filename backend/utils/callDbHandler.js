@@ -4,7 +4,6 @@ const callDbHandler = async (fn, errorMessage = "Database error occurred") => {
   try {
     return await fn();
   } catch (err) {
-    console.log("CALL DB");
     console.error(err);
     if (err.name === "SequelizeUniqueConstraintError") {
       if (err.parent.constraint === "user_username_key") {

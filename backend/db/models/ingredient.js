@@ -1,50 +1,54 @@
-'use strict';
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../../config/database');
-const recipe = require('../models/recipe');
+"use strict";
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../../config/database");
+const Recipe = require("../models/recipe");
 
-const ingredient = sequelize.define('ingredient', {
-  id: {
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    type: DataTypes.INTEGER
+const Ingredient = sequelize.define(
+  "ingredient",
+  {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER,
+    },
+    name: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      validate: {
+        notEmpty: {
+          msg: "Name cannot be empty",
+        },
+      },
+    },
+    amount: {
+      allowNull: false,
+      type: DataTypes.STRING,
+      validate: {
+        notEmpty: {
+          msg: "Name cannot be empty",
+        },
+      },
+    },
+    recipeId: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+    },
   },
-  name: {
-    allowNull: false,
-    type: DataTypes.STRING,
-    validate: {
-      notEmpty: {
-        msg: 'Name cannot be empty'
-      }
-    }
+  {
+    freezeTableName: true,
+    timestamps: false,
   },
-  amount: {
-    allowNull: false,
-    type: DataTypes.STRING,
-    validate: {
-      notEmpty: {
-        msg: 'Name cannot be empty'
-      }
-    }
-  },
-  recipeId: {
-    allowNull: false,
-    type: DataTypes.INTEGER,
-  }
-}, {
-  freezeTableName: true,
-  timestamps: false,
+);
+
+Recipe.hasMany(Ingredient, {
+  foreignKey: "recipeId",
+  as: "ingredients",
 });
 
-recipe.hasMany(ingredient, {
-  foreignKey: 'recipeId',
-  as: 'ingredients'
+Ingredient.belongsTo(Recipe, {
+  foreignKey: "recipeId",
+  as: "recipe",
 });
 
-ingredient.belongsTo(recipe, {
-  foreignKey: 'recipeId',
-  as: 'recipe'
-});
-
-module.exports = ingredient;
+module.exports = Ingredient;

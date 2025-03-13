@@ -1,5 +1,7 @@
 const express = require("express");
 
+const catchAsyncHandler = require("../utils/catchAsyncHandler");
+const { optionalAuth } = require("../middleware/auth");
 const {
   signup,
   login,
@@ -7,9 +9,7 @@ const {
   getUserById,
   getUserFollowing,
   getUserFollowers,
-} = require("../controllers/userController");
-const catchAsyncHandler = require("../utils/catchAsyncHandler");
-const { optionalAuth } = require("../middleware/auth");
+} = require("../controllers/userControllers");
 
 const router = express.Router();
 

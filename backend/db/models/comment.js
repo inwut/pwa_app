@@ -1,78 +1,87 @@
-'use strict';
-const {  DataTypes} = require('sequelize');
+"use strict";
+const { DataTypes } = require("sequelize");
 
-const { sequelize } = require('../../config/database');
-const user = require('../models/user');
-const recipe = require('../models/recipe');
-const AppError = require("../../utils/appError");
+const { sequelize } = require("../../config/database");
+const User = require("../models/user");
+const Recipe = require("../models/recipe");
 
-const comment = sequelize.define('comment', {
-  id: {
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    type: DataTypes.INTEGER
+const Comment = sequelize.define(
+  "comment",
+  {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER,
+    },
+    content: {
+      allowNull: false,
+      type: DataTypes.TEXT,
+      validate: {
+        notEmpty: {
+          msg: "Comment cannot be empty",
+        },
+      },
+    },
+    authorId: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+    },
+    recipeId: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+    },
+    commentId: {
+      type: DataTypes.INTEGER,
+    },
   },
-  content: {
-    allowNull: false,
-    type: DataTypes.TEXT,
-    validate: {
-      notEmpty: {
-        msg: 'Comment cannot be empty'
-      }
-    }
+  {
+    freezeTableName: true,
+    timestamps: true,
+    updatedAt: false,
   },
-  authorId: {
-    allowNull: false,
-    type: DataTypes.INTEGER,
-  },
-  recipeId: {
-    type: DataTypes.INTEGER,
-  },
-  commentId: {
-    type: DataTypes.INTEGER,
-  },
-}, {
-  freezeTableName: true,
-  timestamps: true,
-  updatedAt: false,
-  validate: {
-    checkRecipeOrResponse() {
-      if (!this.recipeId && !this.commentId) {
-        throw new AppError('At least one of recipeId or commentId must be provided');
-      }
-    }
-  }
+);
+
+Comment.belongsTo(User, {
+  foreignKey: "authorId",
+  as: "author",
 });
 
-comment.belongsTo(user, {
-  foreignKey: 'authorId',
-  as: 'author',
+Comment.belongsTo(Recipe, {
+  foreignKey: "recipeId",
+  as: "recipe",
 });
 
-comment.belongsTo(recipe, {
-  foreignKey: 'recipeId',
-  as: 'recipe',
+Comment.belongsTo(Comment, {
+  foreignKey: "commentId",
+  as: "parent",
 });
 
-comment.belongsTo(comment, {
-  foreignKey: 'commentId',
-  as: 'responseToComment',
+User.hasMany(Comment, {
+  foreignKey: "authorId",
+  as: "comments",
 });
 
-user.hasMany(comment, {
-  foreignKey: 'authorId',
-  as: 'comments',
+Recipe.hasMany(Comment, {
+  foreignKey: "recipeId",
+  as: "comments",
 });
 
-recipe.hasMany(comment, {
-  foreignKey: 'recipeId',
-  as: 'comments'
+Comment.hasMany(Comment, {
+  foreignKey: "commentId",
+  as: "responses",
 });
 
-comment.hasMany(comment, {
-  foreignKey: 'commentId',
-  as: 'responses'
+Comment.addScope("withAuthor", {
+  attributes: ["id", "content", "createdAt"],
+  include: [
+    {
+      model: User,
+      as: "author",
+      attributes: ["id", "username"],
+    },
+  ],
+  order: [["id", "ASC"]],
 });
 
-module.exports = comment;
+module.exports = Comment;
