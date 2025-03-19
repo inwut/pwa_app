@@ -1,15 +1,133 @@
-const { literal, Op } = require("sequelize");
+const path = require("path");
 
 const AppError = require("../utils/appError");
-const callDbHandler = require("../utils/callDbHandler");
-const Recipe = require("../db/models/recipe");
-const Ingredient = require("../db/models/ingredient");
-const User = require("../db/models/user");
-const Comment = require("../db/models/comment");
-const Subscription = require("../db/models/subscription");
-const Like = require("../db/models/like");
+const { sequelize } = require("../config/database");
+const recipeDao = require("../dao/recipeDao");
+const userDao = require("../dao/userDao");
+const {
+  generateUniqueImageName,
+  saveImage,
+  deleteImage,
+} = require("../utils/fileUpload");
 
-const formatComments = async (comments) => {
+const createRecipe = async (req, res) => {
+  const { name, instructions, ingredients } = req.body;
+  const userId = req.user.id;
+  const image = req.files?.image;
+
+  const ingredientsArray = JSON.parse(ingredients);
+  if (
+    !Array.isArray(ingredientsArray) ||
+    ingredientsArray.length === 0 ||
+    ingredientsArray.some((ing) => !ing.name || !ing.amount)
+  ) {
+    throw new AppError("Invalid ingredients format", 400);
+  }
+
+  await sequelize.transaction(async (t) => {
+    const imagePath = image ? generateUniqueImageName(image) : null;
+
+    const recipe = await recipeDao.createRecipe(
+      { name, instructions, image: imagePath, authorId: userId },
+      t,
+    );
+
+    const ingredientsData = ingredientsArray.map((ingredient) => ({
+      name: ingredient.name,
+      amount: ingredient.amount,
+      recipeId: recipe.id,
+    }));
+
+    await recipeDao.createRecipeIngredients(ingredientsData, t);
+
+    if (image) {
+      await saveImage(image, imagePath);
+    }
+
+    res.status(201).json({
+      message: "Recipe created successfully",
+      recipe,
+    });
+  });
+};
+
+const updateRecipe = async (req, res) => {
+  const { name, instructions, ingredients } = req.body;
+  const recipeId = req.params.id;
+  const userId = req.user.id;
+  const image = req.files?.image;
+
+  const ingredientsArray = ingredients ? JSON.parse(ingredients) : [];
+  if (
+    !Array.isArray(ingredientsArray) ||
+    (ingredientsArray.length &&
+      ingredientsArray.some((ing) => !ing.name || !ing.amount))
+  ) {
+    throw new AppError("Invalid ingredients format", 400);
+  }
+
+  await sequelize.transaction(async (t) => {
+    const recipe = await recipeDao.getRecipeById(recipeId, t);
+
+    if (!recipe) {
+      throw new AppError("Recipe not found", 404);
+    }
+    if (recipe.author.id !== userId) {
+      throw new AppError(
+        "You don't have permission to update this recipe",
+        403,
+      );
+    }
+
+    const oldImagePath = recipe.image;
+    let imagePath = null;
+
+    if (image) {
+      if (oldImagePath) {
+        imagePath = recipe.image;
+      } else {
+        imagePath = generateUniqueImageName(image);
+      }
+    }
+
+    await recipeDao.updateRecipe(
+      recipe,
+      {
+        name,
+        instructions,
+        image: imagePath,
+      },
+      t,
+    );
+
+    if (ingredientsArray.length) {
+      await recipeDao.deleteRecipeIngredients(recipeId, t);
+
+      const ingredientsData = ingredientsArray.map((ing) => ({
+        name: ing.name,
+        amount: ing.amount,
+        recipeId,
+      }));
+
+      await recipeDao.createRecipeIngredients(ingredientsData, t);
+    }
+
+    if (imagePath) {
+      await saveImage(image, imagePath);
+    } else {
+      if (oldImagePath) {
+        deleteImage(path.join(__dirname, "..", "uploads", oldImagePath));
+      }
+    }
+
+    res.status(200).json({
+      message: "Recipe updated successfully",
+      recipe,
+    });
+  });
+};
+
+const formatComments = (comments) => {
   const plainComments = comments.map((c) => c.toJSON());
   if (!plainComments.length) return [];
 
@@ -52,48 +170,30 @@ const getRecipeById = async (req, res) => {
   const recipeId = req.params.id;
   const authUserId = req.user?.id;
 
-  const recipe = await callDbHandler(() =>
-    Recipe.findByPk(recipeId, {
-      attributes: ["id", "name", "instructions", "image", "createdAt"],
-      include: [
-        {
-          model: Ingredient,
-          as: "ingredients",
-          attributes: ["id", "name", "amount"],
-        },
-        {
-          model: User,
-          as: "author",
-          attributes: ["id", "username"],
-        },
-      ],
-    }),
-  );
+  const recipe =
+    await recipeDao.getRecipeByIdWithAuthorAndIngredients(recipeId);
 
   if (!recipe) {
     throw new AppError("Recipe not found", 404);
   }
 
-  const likesCount = await callDbHandler(() => recipe.countLikes());
-  const comments = await callDbHandler(() =>
-    Comment.scope("withAuthor").findAll({
-      attributes: ["commentId", "recipeId"],
-      where: { recipeId },
-    }),
-  );
-  const formattedComments = await formatComments(comments);
+  const likesCount = await recipeDao.countRecipeLikes(recipe);
+  const comments = await recipeDao.getRecipeComments(recipeId);
+  const formattedComments = formatComments(comments);
 
   let responseData = {
     recipe: {
       ...recipe.toJSON(),
+      image: recipe.image ? `/uploads/${recipe.image}` : null,
       likesCount,
       comments: formattedComments,
     },
   };
 
   if (authUserId) {
-    responseData.recipe.isLiked = await callDbHandler(() =>
-      recipe.hasLike(authUserId),
+    responseData.recipe.isLiked = await recipeDao.isRecipeLikedByUser(
+      recipe,
+      authUserId,
     );
   }
 
@@ -108,53 +208,15 @@ const getRecipes = async (req, res) => {
 
   let followedUsersIds = [];
   if (onlyFollowing === "true" && authUserId) {
-    const subscriptions = await callDbHandler(() =>
-      Subscription.findAll({
-        attributes: ["userId"],
-        where: { subscriberId: authUserId },
-      }),
-    );
+    const subscriptions = userDao.getUserFollowingIds(authUserId);
     followedUsersIds = subscriptions.map((sub) => sub.userId);
-
-    if (followedUsersIds.length === 0) {
-      return res.status(200).json([]);
-    }
   }
 
-  const recipes = await callDbHandler(() =>
-    Recipe.scope("withAuthorAndLikesCount").findAll({
-      attributes: [
-        authUserId
-          ? [
-              literal(
-                `EXISTS (SELECT 1 FROM "like" 
-                  WHERE "like"."recipeId" = "recipe"."id" 
-                  AND "like"."userId" = ${authUserId})`,
-              ),
-              "isLiked",
-            ]
-          : [literal("false"), "isLiked"],
-      ],
-      include: [
-        {
-          model: Ingredient,
-          as: "ingredients",
-          attributes: [],
-          where: ingredientsArray.length
-            ? { name: { [Op.in]: ingredientsArray } }
-            : {},
-          required: ingredientsArray.length > 0,
-        },
-        {
-          model: User,
-          as: "author",
-          where: followedUsersIds.length
-            ? { id: { [Op.in]: followedUsersIds } }
-            : {},
-        },
-      ],
-      where: search ? { name: { [Op.iLike]: `%${search}%` } } : {},
-    }),
+  const recipes = await recipeDao.getAllRecipes(
+    search,
+    followedUsersIds,
+    ingredientsArray,
+    authUserId,
   );
 
   res.status(200).json(recipes);
@@ -165,12 +227,7 @@ const deleteRecipe = async (req, res) => {
   const authUserId = req.user.id;
   const isAdmin = req.user.role === "admin";
 
-  const recipe = await callDbHandler(() =>
-    Recipe.findByPk(recipeId, {
-      attributes: ["id", "name"],
-      include: [{ model: User, as: "author", attributes: ["id"] }],
-    }),
-  );
+  const recipe = await recipeDao.getRecipeByIdWithAuthorId(recipeId);
 
   if (!recipe) {
     throw new AppError("Recipe not found", 404);
@@ -180,7 +237,10 @@ const deleteRecipe = async (req, res) => {
     throw new AppError("You don't have permission to delete this recipe", 403);
   }
 
-  await callDbHandler(() => recipe.destroy());
+  const imagePath = recipe.image;
+  await recipeDao.deleteRecipe(recipe);
+  deleteImage(path.join(__dirname, "..", "uploads", imagePath));
+
   res.status(200).json({ message: "Recipe deleted successfully" });
 };
 
@@ -188,22 +248,12 @@ const likeRecipe = async (req, res) => {
   const recipeId = req.params.id;
   const user = req.user;
 
-  const recipe = await callDbHandler(() =>
-    Recipe.findByPk(recipeId, {
-      include: {
-        model: User,
-        as: "author",
-        attributes: ["id", "username"], // для пушів
-      },
-    }),
-  );
-
+  const recipe = await recipeDao.getRecipeByIdWithAuthorId(recipeId);
   if (!recipe) {
     throw new AppError("Recipe not found", 404);
   }
 
-  await callDbHandler(() => recipe.addLike(user));
-
+  await recipeDao.likeRecipe(recipe, user);
   await res.status(201).json({ message: "Recipe liked successfully" });
 };
 
@@ -211,12 +261,7 @@ const unlikeRecipe = async (req, res) => {
   const recipeId = req.params.id;
   const authUserId = req.user?.id;
 
-  await callDbHandler(() =>
-    Like.destroy({
-      where: { recipeId, userId: authUserId },
-    }),
-  );
-
+  await recipeDao.unlikeRecipe(recipeId, authUserId);
   res.status(201).json({ message: "Recipe unliked successfully" });
 };
 
@@ -224,24 +269,13 @@ const getLikedRecipes = async (req, res) => {
   const { search } = req.query;
   const authUserId = req.user?.id;
 
-  const recipes = await callDbHandler(() =>
-    Recipe.scope("withAuthorAndLikesCount").findAll({
-      attributes: [[literal("true"), "isLiked"]],
-      include: [
-        {
-          model: User,
-          as: "likes",
-          where: { id: authUserId },
-        },
-      ],
-      where: search ? { name: { [Op.iLike]: `%${search}%` } } : {},
-    }),
-  );
-
+  const recipes = await recipeDao.getUserLikedRecipes(authUserId, search);
   res.status(200).json(recipes);
 };
 
 module.exports = {
+  createRecipe,
+  updateRecipe,
   getRecipeById,
   getRecipes,
   deleteRecipe,

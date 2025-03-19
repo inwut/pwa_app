@@ -1,7 +1,7 @@
 const express = require("express");
 
 const catchAsyncHandler = require("../utils/catchAsyncHandler");
-const { optionalAuth } = require("../middleware/auth");
+const { optionalAuth } = require("../middlewares/auth");
 const {
   signup,
   login,

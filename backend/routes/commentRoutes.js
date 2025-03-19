@@ -1,7 +1,7 @@
 const express = require("express");
 
 const catchAsyncHandler = require("../utils/catchAsyncHandler");
-const { auth, restrictByRole } = require("../middleware/auth");
+const { auth, restrictByRole } = require("../middlewares/auth");
 const {
   createComment,
   deleteComment,

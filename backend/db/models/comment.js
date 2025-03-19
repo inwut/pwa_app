@@ -72,16 +72,4 @@ Comment.hasMany(Comment, {
   as: "responses",
 });
 
-Comment.addScope("withAuthor", {
-  attributes: ["id", "content", "createdAt"],
-  include: [
-    {
-      model: User,
-      as: "author",
-      attributes: ["id", "username"],
-    },
-  ],
-  order: [["createdAt", "DESC"]],
-});
-
 module.exports = Comment;

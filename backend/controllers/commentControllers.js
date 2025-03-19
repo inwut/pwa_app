@@ -1,34 +1,21 @@
-const Comment = require("../db/models/comment");
-const callDbHandler = require("../utils/callDbHandler");
-const User = require("../db/models/user");
 const AppError = require("../utils/appError");
-const Recipe = require("../db/models/recipe");
+const commentDao = require("../dao/commentDao");
+const userDao = require("../dao/userDao");
+const recipeDao = require("../dao/recipeDao");
 
 const createComment = async (req, res) => {
   const authorId = req.user.id;
   const { content, recipeId, commentId } = req.body;
 
-  const comment = await callDbHandler(() =>
-    Comment.create({
-      content,
-      authorId,
-      recipeId,
-      commentId,
-    }),
-  );
+  const comment = await commentDao.createComment({
+    content,
+    authorId,
+    recipeId,
+    commentId,
+  });
 
-  const commenter = callDbHandler(() =>
-    User.findByPk(comment.authorId, {
-      attributes: ["username"],
-    }),
-  );
-
-  const recipe = callDbHandler(() =>
-    Recipe.findByPk(comment.recipeId, {
-      attributes: ["name"],
-    }),
-  ); // для пушів
-
+  const commenter = await userDao.getUserById(comment.authorId);
+  const recipe = await recipeDao.getRecipeById(comment.recipeId); // для пушів
   res.status(201).json(comment);
 };
 
@@ -37,12 +24,7 @@ const deleteComment = async (req, res) => {
   const authUserId = req.user.id;
   const isAdmin = req.user.role === "admin";
 
-  const comment = await callDbHandler(() =>
-    Comment.findByPk(commentId, {
-      attributes: ["id", "content"],
-      include: [{ model: User, as: "author", attributes: ["id"] }],
-    }),
-  );
+  const comment = await commentDao.getCommentById(commentId);
 
   if (!comment) {
     throw new AppError("Comment not found", 404);
@@ -52,7 +34,7 @@ const deleteComment = async (req, res) => {
     throw new AppError("You don't have permission to delete this comment", 403);
   }
 
-  await callDbHandler(() => comment.destroy());
+  await commentDao.deleteComment(comment);
   res.status(200).json({ message: "Comment deleted successfully" });
 };
 
