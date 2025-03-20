@@ -15,15 +15,6 @@ const createRecipe = async (req, res) => {
   const userId = req.user.id;
   const image = req.files?.image;
 
-  const ingredientsArray = JSON.parse(ingredients);
-  if (
-    !Array.isArray(ingredientsArray) ||
-    ingredientsArray.length === 0 ||
-    ingredientsArray.some((ing) => !ing.name || !ing.amount)
-  ) {
-    throw new AppError("Invalid ingredients format", 400);
-  }
-
   await sequelize.transaction(async (t) => {
     const imagePath = image ? generateUniqueImageName(image) : null;
 
@@ -32,7 +23,7 @@ const createRecipe = async (req, res) => {
       t,
     );
 
-    const ingredientsData = ingredientsArray.map((ingredient) => ({
+    const ingredientsData = ingredients.map((ingredient) => ({
       name: ingredient.name,
       amount: ingredient.amount,
       recipeId: recipe.id,
@@ -56,15 +47,6 @@ const updateRecipe = async (req, res) => {
   const recipeId = req.params.id;
   const userId = req.user.id;
   const image = req.files?.image;
-
-  const ingredientsArray = ingredients ? JSON.parse(ingredients) : [];
-  if (
-    !Array.isArray(ingredientsArray) ||
-    (ingredientsArray.length &&
-      ingredientsArray.some((ing) => !ing.name || !ing.amount))
-  ) {
-    throw new AppError("Invalid ingredients format", 400);
-  }
 
   await sequelize.transaction(async (t) => {
     const recipe = await recipeDao.getRecipeById(recipeId, t);
@@ -100,17 +82,15 @@ const updateRecipe = async (req, res) => {
       t,
     );
 
-    if (ingredientsArray.length) {
-      await recipeDao.deleteRecipeIngredients(recipeId, t);
+    await recipeDao.deleteRecipeIngredients(recipeId, t);
 
-      const ingredientsData = ingredientsArray.map((ing) => ({
-        name: ing.name,
-        amount: ing.amount,
-        recipeId,
-      }));
+    const ingredientsData = ingredients.map((ing) => ({
+      name: ing.name,
+      amount: ing.amount,
+      recipeId,
+    }));
 
-      await recipeDao.createRecipeIngredients(ingredientsData, t);
-    }
+    await recipeDao.createRecipeIngredients(ingredientsData, t);
 
     if (imagePath) {
       await saveImage(image, imagePath);
@@ -155,15 +135,12 @@ const formatComments = (comments) => {
     }
   });
 
-  const cleanCommentsData = (comments) =>
-    comments.map(({ commentId, recipeId, responses, ...rest }) => ({
-      ...rest,
-      responses: responses
-        .map(({ commentId, recipeId, responses, ...rest }) => ({ ...rest }))
-        .sort((a, b) => a.id - b.id),
-    }));
-
-  return cleanCommentsData(responseData);
+  return responseData.map(({ commentId, recipeId, responses, ...rest }) => ({
+    ...rest,
+    responses: responses
+      .map(({ commentId, recipeId, responses, ...rest }) => ({ ...rest }))
+      .sort((a, b) => a.id - b.id),
+  }));
 };
 
 const getRecipeById = async (req, res) => {

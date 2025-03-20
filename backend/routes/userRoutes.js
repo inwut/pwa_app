@@ -3,6 +3,12 @@ const express = require("express");
 const catchAsyncHandler = require("../utils/catchAsyncHandler");
 const { optionalAuth } = require("../middlewares/auth");
 const {
+  loginValidator,
+  signupValidator,
+} = require("../middlewares/validators/userValidators");
+const { idValidator } = require("../middlewares/validators/idValidator");
+const validationHandler = require("../middlewares/validationHandler");
+const {
   signup,
   login,
   getUsers,
@@ -15,14 +21,40 @@ const router = express.Router();
 
 router.get("/", catchAsyncHandler(getUsers));
 
-router.post("/signup", catchAsyncHandler(signup));
+router.post(
+  "/signup",
+  signupValidator,
+  validationHandler,
+  catchAsyncHandler(signup),
+);
 
-router.post("/login", catchAsyncHandler(login));
+router.post(
+  "/login",
+  loginValidator,
+  validationHandler,
+  catchAsyncHandler(login),
+);
 
-router.get("/:id", optionalAuth, catchAsyncHandler(getUserById));
+router.get(
+  "/:id",
+  optionalAuth,
+  idValidator,
+  validationHandler,
+  catchAsyncHandler(getUserById),
+);
 
-router.get("/:id/following", catchAsyncHandler(getUserFollowing));
+router.get(
+  "/:id/following",
+  idValidator,
+  validationHandler,
+  catchAsyncHandler(getUserFollowing),
+);
 
-router.get("/:id/followers", catchAsyncHandler(getUserFollowers));
+router.get(
+  "/:id/followers",
+  idValidator,
+  validationHandler,
+  catchAsyncHandler(getUserFollowers),
+);
 
 module.exports = router;
