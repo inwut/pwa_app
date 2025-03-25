@@ -1,6 +1,7 @@
 require("dotenv").config({ path: `${process.cwd()}/.env` });
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const fileUpload = require("express-fileupload");
 
@@ -16,9 +17,17 @@ require("./config/passport");
 const PORT = process.env.APP_PORT || 5000;
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(express.json());
 app.use(passport.initialize());
+app.use("/uploads", express.static("uploads"));
 app.use(
   fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 },

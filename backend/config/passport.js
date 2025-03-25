@@ -5,7 +5,7 @@ const passport = require("passport");
 const userDao = require("../dao/userDao");
 
 const options = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: ExtractJwt.fromExtractors([(req) => req.cookies.token]),
   secretOrKey: process.env.JWT_SECRET,
 };
 

@@ -1,7 +1,7 @@
 const express = require("express");
 
 const catchAsyncHandler = require("../utils/catchAsyncHandler");
-const { optionalAuth } = require("../middlewares/auth");
+const { optionalAuth, auth } = require("../middlewares/auth");
 const {
   loginValidator,
   signupValidator,
@@ -11,6 +11,8 @@ const validationHandler = require("../middlewares/validationHandler");
 const {
   signup,
   login,
+  logout,
+  me,
   getUsers,
   getUserById,
   getUserFollowing,
@@ -34,6 +36,10 @@ router.post(
   validationHandler,
   catchAsyncHandler(login),
 );
+
+router.post("/logout", logout);
+
+router.get("/me", auth, me);
 
 router.get(
   "/:id",

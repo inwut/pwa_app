@@ -23,9 +23,14 @@ const signup = async (req, res) => {
 
   const token = generateToken(newUser);
 
+  res.cookie("token", token, {
+    httpOnly: true,
+    // secure: true,
+    sameSite: "strict",
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
   res.status(201).json({
-    message: "Signed up successfully",
-    token,
     id: newUser.id,
     role: newUser.role,
   });
@@ -41,9 +46,27 @@ const login = async (req, res) => {
 
   const token = generateToken(user);
 
+  res.cookie("token", token, {
+    httpOnly: true,
+    // secure: true,
+    sameSite: "strict",
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
   res.status(200).json({
-    message: "Logged in successfully",
-    token,
+    id: user.id,
+    role: user.role,
+  });
+};
+
+const logout = async (req, res) => {
+  res.clearCookie("token");
+  res.json({ message: "Logged out successfully" });
+};
+
+const me = (req, res) => {
+  const user = req.user;
+  res.json({
     id: user.id,
     role: user.role,
   });
@@ -120,6 +143,8 @@ const getUserFollowers = async (req, res) => {
 module.exports = {
   signup,
   login,
+  logout,
+  me,
   getUsers,
   getUserById,
   getUserFollowing,
