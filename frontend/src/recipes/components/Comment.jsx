@@ -7,8 +7,13 @@ import "./Comment.css";
 import Button from "../../common/components/pageElements/Button.jsx";
 import Info from "../../common/components/pageElements/Info.jsx";
 import StyledTextField from "../../common/components/pageElements/StyledTextField.jsx";
+import api from "../../common/api.js";
+import { useAuth } from "../../common/providers/AuthProvider.jsx";
+import { useError } from "../../common/providers/ErrorProvider.jsx";
 
-const Comment = ({ parent, comment }) => {
+const Comment = ({ isParent, comment, recipeId, reloadData }) => {
+  const { currentUser } = useAuth();
+  const { showError } = useError();
   const [reply, setReply] = useState("");
   const [showReplyField, setShowReplyField] = useState(false);
 
@@ -16,32 +21,33 @@ const Comment = ({ parent, comment }) => {
     setShowReplyField((prevState) => !prevState);
   };
 
-  const sendReplyHandler = () => {
-    //api request
-    setShowReplyField(false);
-  };
-
-  const deleteCommentHandler = () => {
-    // api request
-  };
-
-  const reformatResponses = (responses) => {
-    const reformattedResponses = [];
-    const reformat = (comments, parentAuthor = comment.author) => {
-      comments.forEach((comment) => {
-        reformattedResponses.push({ ...comment, to: parentAuthor });
-        if (comment.responses) {
-          reformat(comment.responses, comment.author);
-        }
+  const sendReplyHandler = async () => {
+    try {
+      await api.post("comments/", {
+        content: reply,
+        recipeId,
+        commentId: comment.id,
       });
-    };
-    reformat(responses);
-    return reformattedResponses;
+      await reloadData();
+      setReply("");
+      setShowReplyField(false);
+    } catch (error) {
+      showError(error);
+    }
+  };
+
+  const deleteCommentHandler = async () => {
+    try {
+      await api.delete(`comments/${comment.id}`);
+      await reloadData();
+    } catch (error) {
+      showError(error);
+    }
   };
 
   return (
     <div className="comment">
-      <Info>
+      <Info style={{ alignItems: "start" }}>
         <div className="comment__info-section">
           <Link to={`/profile/${comment.author.id}`}>
             <Button text={`@${comment.author.username}`} />
@@ -52,22 +58,21 @@ const Comment = ({ parent, comment }) => {
               <Button text={`@${comment.to.username}`} />
             </Link>
           )}
-        </div>
-        <div className="comment__info-section">
-          <span>{comment.created_at}</span>
-          {comment.author.id === 1 && (
-            <Button
-              icon={<DeleteOutlineIcon />}
-              onClick={deleteCommentHandler}
-            />
-          )}
+          {currentUser &&
+            (comment.author.id === currentUser.id ||
+              currentUser.role === "admin") && (
+              <Button
+                icon={<DeleteOutlineIcon />}
+                onClick={deleteCommentHandler}
+              />
+            )}
         </div>
       </Info>
       <p
         className="text--primary comment__text"
         onClick={toggleReplyFieldHandler}
       >
-        {comment.text}
+        {comment.content}
       </p>
       {showReplyField && (
         <div className="comment__reply">
@@ -88,11 +93,9 @@ const Comment = ({ parent, comment }) => {
         </div>
       )}
       <div className="comment__responses">
-        {parent &&
+        {isParent &&
           comment.responses &&
-          reformatResponses(comment.responses).map((c) => (
-            <Comment key={c.id} comment={c} />
-          ))}
+          comment.responses.map((c) => <Comment key={c.id} comment={c} />)}
       </div>
     </div>
   );

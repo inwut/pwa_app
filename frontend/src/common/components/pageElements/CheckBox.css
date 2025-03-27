@@ -1,6 +1,6 @@
-.checkbox label {
+.checkbox label .MuiTypography-root {
     color: #74796D;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 400;
     font-family: "Libre Franklin", serif;
     font-optical-sizing: auto;

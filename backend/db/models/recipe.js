@@ -1,5 +1,5 @@
 "use strict";
-const { DataTypes, fn, col } = require("sequelize");
+const { DataTypes, col, literal } = require("sequelize");
 const { sequelize } = require("../../config/database");
 const User = require("../models/user");
 
@@ -76,7 +76,12 @@ Recipe.addScope("withAuthorAndLikesCount", {
     "id",
     "name",
     "image",
-    [fn("COUNT", col("likes.id")), "likesCount"],
+    [
+      literal(
+        `(SELECT COUNT(*) FROM "like" WHERE "like"."recipeId" = "recipe"."id")`,
+      ),
+      "likesCount",
+    ],
   ],
   include: [
     {
@@ -84,15 +89,11 @@ Recipe.addScope("withAuthorAndLikesCount", {
       as: "author",
       attributes: ["id", "username"],
     },
-    {
-      model: User,
-      as: "likes",
-      attributes: [],
-      through: { attributes: [] },
-    },
   ],
-  group: ["recipe.id", "author.id"],
-  order: [[col("likesCount"), "DESC"]],
+  order: [
+    [col("likesCount"), "DESC"],
+    ["id", "ASC"],
+  ],
 });
 
 module.exports = Recipe;

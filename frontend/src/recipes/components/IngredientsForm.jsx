@@ -26,14 +26,18 @@ const IngredientsForm = ({ onAdd, ingredients }) => {
         type="text"
         autoComplete="off"
         fullWidth
-        {...register("ingredient", {
+        {...register("name", {
           required: "Ingredient is required.",
-          validate: (value) =>
-            !ingredients.some((i) => i.ingredient === value) ||
-            "This ingredient is already added.",
+          validate: {
+            noCommas: (value) =>
+              !value.includes(",") || "Ingredient name cannot contain commas.",
+            notDuplicate: (value) =>
+              !ingredients.some((i) => i.ingredient === value) ||
+              "This ingredient is already added.",
+          },
         })}
-        error={!!errors.ingredient}
-        helperText={errors.ingredient?.message}
+        error={!!errors.name}
+        helperText={errors.name?.message}
       />
       <StyledTextField
         label="Amount"

@@ -124,7 +124,7 @@ const getUserFollowing = async (req, res) => {
   }
 
   const following = await userDao.getUserFollowing(user, search);
-  res.status(200).json({ following });
+  res.status(200).json([...following]);
 };
 
 const getUserFollowers = async (req, res) => {
@@ -137,7 +137,7 @@ const getUserFollowers = async (req, res) => {
   }
 
   const followers = await userDao.getUserFollowers(user, search);
-  res.status(200).json({ followers });
+  res.status(200).json([...followers]);
 };
 
 module.exports = {

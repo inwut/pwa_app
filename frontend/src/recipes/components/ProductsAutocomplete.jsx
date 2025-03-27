@@ -3,9 +3,11 @@ import useAutocomplete from "@mui/material/useAutocomplete";
 import CloseIcon from "@mui/icons-material/Close";
 
 import "./ProductsAutocomplete.css";
+import useApiRequest from "../../common/hooks/useApiRequest.jsx";
 
 const ProductsAutocomplete = ({ onIngredientsChange }) => {
   const [ingredients, setIngredients] = useState([]);
+  const { fetchData, isLoading } = useApiRequest();
 
   const {
     getRootProps,
@@ -22,12 +24,6 @@ const ProductsAutocomplete = ({ onIngredientsChange }) => {
     getOptionLabel: (option) => option.name,
   });
 
-  const testIngredients = [
-    { id: 1, name: "Bread" },
-    { id: 2, name: "Water" },
-    { id: 3, name: "Salt" },
-  ];
-
   useEffect(() => {
     fetchIngredients();
   }, []);
@@ -38,9 +34,9 @@ const ProductsAutocomplete = ({ onIngredientsChange }) => {
     }
   }, [value, onIngredientsChange]);
 
-  const fetchIngredients = () => {
-    // api request
-    setIngredients(testIngredients);
+  const fetchIngredients = async () => {
+    const data = await fetchData("recipes/ingredients");
+    if (data) setIngredients(data);
   };
 
   return (
@@ -62,11 +58,11 @@ const ProductsAutocomplete = ({ onIngredientsChange }) => {
         <input
           id="product-input"
           placeholder="Ingredient..."
-          className="autocomplete__input"
+          className="text--primary autocomplete__input"
           {...getInputProps()}
         />
       </div>
-      {groupedOptions.length > 0 ? (
+      {!isLoading && groupedOptions && groupedOptions.length > 0 ? (
         <ul className="autocomplete__list" {...getListboxProps()}>
           {groupedOptions.map((option, index) => {
             const { key, ...optionProps } = getOptionProps({ option, index });

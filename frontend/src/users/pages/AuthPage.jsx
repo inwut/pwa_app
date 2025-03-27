@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 import "./AuthPage.css";
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
 import Button from "../../common/components/pageElements/Button.jsx";
 import StyledTextField from "../../common/components/pageElements/StyledTextField.jsx";
+import { useAuth } from "../../common/providers/AuthProvider.jsx";
 
 const AuthPage = () => {
+  const { signup, login } = useAuth();
+  const navigate = useNavigate();
   const [isSignUpMode, setIsSignUpMode] = useState(true);
   const {
     register,
@@ -23,12 +27,13 @@ const AuthPage = () => {
     unregister("username");
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async ({ username, email, password }) => {
     if (isSignUpMode) {
-      // api request sign up
+      await signup(username, email, password);
     } else {
-      // api request log in
+      await login(email, password);
     }
+    navigate("/");
   };
 
   return (
@@ -49,7 +54,11 @@ const AuthPage = () => {
               required: "Username is required.",
               minLength: {
                 value: 3,
-                message: "Username should be minimum of 3 symbols.",
+                message: "Username should be minimum of 3 characters.",
+              },
+              maxLength: {
+                value: 20,
+                message: "Username should be maximum of 20 characters.",
               },
             })}
             error={!!errors.username}
@@ -80,7 +89,7 @@ const AuthPage = () => {
             required: "Password is required.",
             minLength: {
               value: 6,
-              message: "Password should be minimum of 6 symbols.",
+              message: "Password should be minimum of 6 characters.",
             },
           })}
           error={!!errors.password}

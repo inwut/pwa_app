@@ -12,12 +12,14 @@ const validationHandler = require("../middlewares/validationHandler");
 const {
   createRecipe,
   getRecipeById,
+  getRecipeByIdToEdit,
   getRecipes,
   deleteRecipe,
   likeRecipe,
   unlikeRecipe,
   getLikedRecipes,
   updateRecipe,
+  getAllRecipesUniqueIngredients,
 } = require("../controllers/recipeControllers");
 
 const router = express.Router();
@@ -45,6 +47,15 @@ router.get(
   auth,
   restrictByRole("user"),
   catchAsyncHandler(getLikedRecipes),
+);
+
+router.get("/ingredients", catchAsyncHandler(getAllRecipesUniqueIngredients));
+
+router.get(
+  "/edit/:id",
+  auth,
+  idValidator,
+  catchAsyncHandler(getRecipeByIdToEdit),
 );
 
 router.get("/:id", optionalAuth, idValidator, catchAsyncHandler(getRecipeById));

@@ -37,9 +37,9 @@ const IngredientsTable = ({ create, show, rows, onDelete }) => {
             </TableHead>
           )}
           <TableBody>
-            {rows.map(({ id, ingredient, amount }) => (
+            {rows.map(({ id, name, amount }) => (
               <TableRow key={id}>
-                <TableCell>{ingredient}</TableCell>
+                <TableCell>{name}</TableCell>
                 <TableCell>{amount}</TableCell>
                 {create && (
                   <TableCell>

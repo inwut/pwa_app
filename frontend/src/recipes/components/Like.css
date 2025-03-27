@@ -14,14 +14,14 @@
 }
 
 .like svg {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
 }
 
 .like label {
     margin: 0;
 }
 
-.like span {
+.like span.MuiButtonBase-root {
     padding-bottom: 0.2rem;
     color: #74796D;
 }

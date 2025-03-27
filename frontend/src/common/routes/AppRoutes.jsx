@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 
-import { useAuth } from "../components/auth/AuthProvider.jsx";
+import { useAuth } from "../providers/AuthProvider.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import HomePage from "../pages/HomePage.jsx";
 import RecipesPage from "../../recipes/pages/RecipesPage.jsx";

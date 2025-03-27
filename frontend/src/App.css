@@ -1,5 +1,5 @@
 .main {
-    padding: 6rem 2rem 1.7rem 2rem;
+    padding: 6rem 2rem 2rem 2rem;
     min-height: 100vh;
     background-color: #F9FAEF;
 }
@@ -9,8 +9,14 @@
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
-    padding-top: 2rem;
     width: 100%;
+}
+
+.text--filler {
+    margin-top: 3rem;
+    text-align: center;
+    font-size: 1.5rem;
+    color: #74796D;
 }
 
 .text--primary {
@@ -33,6 +39,6 @@
 
 @media (min-width: 800px) {
     .main {
-        padding: 6rem 4rem 1.7rem 4rem;
+        padding: 6rem 4rem 5rem 4rem;
     }
 }

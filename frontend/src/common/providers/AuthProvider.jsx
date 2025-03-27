@@ -5,16 +5,29 @@ import {
   useEffect,
   useState,
 } from "react";
-import api from "../../api.js";
+import api from "../api.js";
+import { useError } from "./ErrorProvider.jsx";
 
 const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
+  const { showError } = useError();
 
   useEffect(() => {
     getCurrentUser();
   }, []);
+
+  // api.interceptors.response.use(
+  //   (response) => {
+  //     return response;
+  //   },
+  //   (error) => {
+  //     if (error.response?.status === 401) {
+  //       logout().then();
+  //     }
+  //   },
+  // );
 
   const getCurrentUser = useCallback(async () => {
     try {
@@ -22,43 +35,43 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(response.data);
     } catch (error) {
       setCurrentUser(null);
+      showError(error);
     }
   }, []);
 
   const signup = useCallback(async (username, email, password) => {
     try {
-      const response = await api.post(
-        "http://localhost:5000/api/users/signup",
-        {
-          username,
-          email,
-          password,
-        },
-      );
-      setCurrentUser(response.data);
-    } catch (error) {
-      setCurrentUser(null);
-    }
-  }, []);
-
-  const login = useCallback(async (email, password) => {
-    try {
-      const response = await api.post("http://localhost:5000/api/users/login", {
+      const response = await api.post("users/signup", {
+        username,
         email,
         password,
       });
       setCurrentUser(response.data);
     } catch (error) {
       setCurrentUser(null);
+      showError(error);
+    }
+  }, []);
+
+  const login = useCallback(async (email, password) => {
+    try {
+      const response = await api.post("users/login", {
+        email,
+        password,
+      });
+      setCurrentUser(response.data);
+    } catch (error) {
+      setCurrentUser(null);
+      showError(error);
     }
   }, []);
 
   const logout = useCallback(async () => {
     try {
-      await api.post("http://localhost:5000/api/users/logout");
+      await api.post("users/logout");
       setCurrentUser(null);
     } catch (error) {
-      setCurrentUser(null);
+      showError(error);
     }
   }, []);
 

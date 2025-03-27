@@ -1,4 +1,4 @@
-const { literal, Op } = require("sequelize");
+const { literal, Op, fn, col } = require("sequelize");
 
 const callDbHandler = require("../utils/callDbHandler");
 const Recipe = require("../db/models/recipe");
@@ -105,19 +105,24 @@ const getAllRecipes = async (search, following, ingredients, authUserId) => {
       ],
       include: [
         {
-          model: Ingredient,
-          as: "ingredients",
-          attributes: [],
-          where: ingredients.length ? { name: { [Op.in]: ingredients } } : {},
-          required: ingredients.length > 0,
-        },
-        {
           model: User,
           as: "author",
           where: following.length ? { id: { [Op.in]: following } } : {},
         },
       ],
-      where: search ? { name: { [Op.iLike]: `%${search}%` } } : {},
+      where: {
+        ...(search && { name: { [Op.iLike]: `%${search}%` } }),
+        ...(ingredients.length && {
+          [Op.and]: ingredients.map((ingredient) =>
+            literal(
+              `"recipe"."id" IN (
+                SELECT "recipeId" FROM "ingredient" 
+                WHERE "ingredient"."name" = '${ingredient}'
+              )`,
+            ),
+          ),
+        }),
+      },
     }),
   );
 };
@@ -145,17 +150,22 @@ const getUserRecipes = async (userId, authUserId) => {
   );
 };
 
-const getUserLikedRecipes = async (userId, search) => {
+const getUserLikedRecipes = async (userId, user, search) => {
   return await callDbHandler(() =>
-    Recipe.scope("withAuthorAndLikesCount").findAll({
-      attributes: [[literal("true"), "isLiked"]],
-      include: [
-        {
-          model: User,
-          as: "likes",
-          where: { id: userId },
-        },
-      ],
+    user.getLikedRecipes({
+      ...Recipe.options.scopes.withAuthorAndLikesCount,
+      attributes: {
+        include: [
+          [literal("true"), "isLiked"],
+          [
+            literal(
+              `(SELECT COUNT(*) FROM "like" WHERE "like"."recipeId" = "recipe"."id")`,
+            ),
+            "likesCount",
+          ],
+        ],
+      },
+      joinTableAttributes: [],
       where: search ? { name: { [Op.iLike]: `%${search}%` } } : {},
     }),
   );
@@ -170,6 +180,16 @@ const createRecipeIngredients = async (ingredientsData, transaction) => {
 const deleteRecipeIngredients = async (recipeId, transaction) => {
   await callDbHandler(() =>
     Ingredient.destroy({ where: { recipeId }, transaction }),
+  );
+};
+
+const getAllRecipesUniqueIngredients = async () => {
+  return await callDbHandler(() =>
+    Ingredient.findAll({
+      attributes: [[fn("DISTINCT", col("name")), "name"]],
+      order: [["name", "ASC"]],
+      raw: true,
+    }),
   );
 };
 
@@ -190,4 +210,5 @@ module.exports = {
   getUserLikedRecipes,
   createRecipeIngredients,
   deleteRecipeIngredients,
+  getAllRecipesUniqueIngredients,
 };

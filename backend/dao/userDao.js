@@ -11,6 +11,7 @@ const getUserById = async (id) => {
   return await callDbHandler(() =>
     User.findByPk(id, {
       attributes: ["id", "username", "role"],
+      where: { role: "user" },
     }),
   );
 };
@@ -31,7 +32,10 @@ const getUserFollowingIds = async (userId) => {
 const getAllUsers = async (search) => {
   return await callDbHandler(() =>
     User.scope("withLikesAndFollowersCount").findAll({
-      where: search ? { username: { [Op.iLike]: `%${search}%` } } : {},
+      where: {
+        ...(search ? { username: { [Op.iLike]: `%${search}%` } } : {}),
+        role: "user",
+      },
       order: [[col("followersCount"), "DESC"]],
     }),
   );

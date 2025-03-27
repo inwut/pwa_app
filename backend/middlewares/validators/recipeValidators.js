@@ -16,17 +16,32 @@ const recipeDataValidator = [
   body("ingredients")
     .notEmpty()
     .withMessage("Ingredients are required")
-    .isArray()
-    .withMessage("Invalid ingredients format")
-    .custom((value) => {
-      if (value.length === 0 || value.some((ing) => !ing.name || !ing.amount)) {
+    .customSanitizer((value) => {
+      let ingredients;
+      try {
+        ingredients = JSON.parse(value);
+      } catch (error) {
         throw new AppError("Invalid ingredients format", 400);
       }
-      value.forEach((ing) => {
-        ing.name = ing.name.trim().replace(/[<>]/g, "");
-        ing.amount = ing.amount.trim().replace(/[<>]/g, "");
-      });
+      return ingredients;
+    })
+    .custom((value) => {
+      if (
+        !Array.isArray(value) ||
+        value.length === 0 ||
+        value.some((ing) => !ing.name || !ing.amount)
+      ) {
+        throw new AppError("Invalid ingredients format", 400);
+      }
       return true;
+    })
+    .customSanitizer((value) => {
+      return value.map((ing) => {
+        return {
+          name: ing.name.trim().replace(/[<>]/g, ""),
+          amount: ing.amount.trim().replace(/[<>]/g, ""),
+        };
+      });
     }),
 ];
 

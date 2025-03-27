@@ -5,48 +5,43 @@ import UserCardList from "../components/UserCardList.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import SearchField from "../../common/components/pageElements/SearchField.jsx";
+import Loader from "../../common/components/Loader.jsx";
 import useSearchInput from "../../common/hooks/useSearchInput.js";
+import useApiRequest from "../../common/hooks/useApiRequest.jsx";
 
 const UsersPage = ({ type }) => {
   const userId = useParams().userId;
   const [users, setUsers] = useState([]);
+  const { fetchData, isLoading } = useApiRequest();
   const { searchInput, setSearchInput, debouncedSearchInput } =
     useSearchInput();
 
-  const testUsers = [
-    {
-      id: 1,
-      username: "dariavetrykush",
-      recipes: 21,
-      followers: 45,
-    },
-    {
-      id: 2,
-      username: "semytskiy",
-      recipes: 21,
-      followers: 45,
-    },
-    {
-      id: 3,
-      username: "inwut",
-      recipes: 21,
-      followers: 45,
-    },
-  ];
-
   useEffect(() => {
     fetchUsersData();
-  }, [debouncedSearchInput]);
+  }, [debouncedSearchInput, userId]);
 
-  const fetchUsersData = () => {
+  const fetchUsersData = async () => {
+    let data;
     if (type === "following") {
-      // api request to userId following
+      data = await fetchData(`users/${userId}/following`, {
+        params: {
+          search: debouncedSearchInput || null,
+        },
+      });
     } else if (type === "followers") {
-      // api request to userId followers
+      data = await fetchData(`users/${userId}/followers`, {
+        params: {
+          search: debouncedSearchInput || null,
+        },
+      });
     } else {
-      // api request users
+      data = await fetchData("users", {
+        params: {
+          search: debouncedSearchInput || null,
+        },
+      });
     }
-    setUsers(testUsers);
+    if (data) setUsers(data);
   };
 
   return (
@@ -61,7 +56,11 @@ const UsersPage = ({ type }) => {
           />
         </div>
       </PageHeader>
-      <UserCardList users={users} />
+      {isLoading ? (
+        <Loader />
+      ) : (
+        users !== null && <UserCardList users={users} />
+      )}
     </>
   );
 };

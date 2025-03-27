@@ -13,10 +13,10 @@ const {
 const createRecipe = async (req, res) => {
   const { name, instructions, ingredients } = req.body;
   const userId = req.user.id;
-  const image = req.files?.image;
+  const imageFile = req.files?.image;
 
   await sequelize.transaction(async (t) => {
-    const imagePath = image ? generateUniqueImageName(image) : null;
+    const imagePath = imageFile ? generateUniqueImageName(imageFile) : null;
 
     const recipe = await recipeDao.createRecipe(
       { name, instructions, image: imagePath, authorId: userId },
@@ -31,8 +31,8 @@ const createRecipe = async (req, res) => {
 
     await recipeDao.createRecipeIngredients(ingredientsData, t);
 
-    if (image) {
-      await saveImage(image, imagePath);
+    if (imageFile) {
+      await saveImage(imageFile, imagePath);
     }
 
     res.status(201).json({
@@ -43,10 +43,10 @@ const createRecipe = async (req, res) => {
 };
 
 const updateRecipe = async (req, res) => {
-  const { name, instructions, ingredients } = req.body;
+  const { name, instructions, ingredients, image } = req.body;
   const recipeId = req.params.id;
   const userId = req.user.id;
-  const image = req.files?.image;
+  const imageFile = req.files?.image;
 
   await sequelize.transaction(async (t) => {
     const recipe = await recipeDao.getRecipeById(recipeId, t);
@@ -54,7 +54,8 @@ const updateRecipe = async (req, res) => {
     if (!recipe) {
       throw new AppError("Recipe not found", 404);
     }
-    if (recipe.author.id !== userId) {
+
+    if (recipe.authorId !== userId) {
       throw new AppError(
         "You don't have permission to update this recipe",
         403,
@@ -64,11 +65,11 @@ const updateRecipe = async (req, res) => {
     const oldImagePath = recipe.image;
     let imagePath = null;
 
-    if (image) {
+    if (imageFile) {
       if (oldImagePath) {
         imagePath = recipe.image;
       } else {
-        imagePath = generateUniqueImageName(image);
+        imagePath = generateUniqueImageName(imageFile);
       }
     }
 
@@ -77,7 +78,7 @@ const updateRecipe = async (req, res) => {
       {
         name,
         instructions,
-        image: imagePath,
+        image: image ? image : imagePath,
       },
       t,
     );
@@ -92,12 +93,10 @@ const updateRecipe = async (req, res) => {
 
     await recipeDao.createRecipeIngredients(ingredientsData, t);
 
-    if (imagePath) {
-      await saveImage(image, imagePath);
-    } else {
-      if (oldImagePath) {
-        deleteImage(path.join(__dirname, "..", "uploads", oldImagePath));
-      }
+    if (imageFile) {
+      await saveImage(imageFile, imagePath);
+    } else if (!image && oldImagePath) {
+      deleteImage(path.join(__dirname, "..", "uploads", oldImagePath));
     }
 
     res.status(200).json({
@@ -161,8 +160,9 @@ const getRecipeById = async (req, res) => {
   let responseData = {
     recipe: {
       ...recipe.toJSON(),
-      image: recipe.image ? `/uploads/${recipe.image}` : null,
+      image: recipe.image ? recipe.image : null,
       likesCount,
+      commentsCount: comments.length,
       comments: formattedComments,
     },
   };
@@ -177,6 +177,31 @@ const getRecipeById = async (req, res) => {
   res.status(200).json(responseData);
 };
 
+const getRecipeByIdToEdit = async (req, res) => {
+  const recipeId = req.params.id;
+  const authUserId = req.user.id;
+
+  const recipe =
+    await recipeDao.getRecipeByIdWithAuthorAndIngredients(recipeId);
+
+  if (!recipe) {
+    throw new AppError("Recipe not found", 404);
+  }
+
+  if (recipe.author.id !== authUserId) {
+    throw new AppError("You don't have permission to update this recipe", 403);
+  }
+
+  let responseData = {
+    recipe: {
+      ...recipe.toJSON(),
+      image: recipe.image ? recipe.image : null,
+    },
+  };
+
+  res.status(200).json(responseData);
+};
+
 const getRecipes = async (req, res) => {
   const { search, onlyFollowing, ingredients } = req.query;
   const authUserId = req.user?.id;
@@ -185,8 +210,12 @@ const getRecipes = async (req, res) => {
 
   let followedUsersIds = [];
   if (onlyFollowing === "true" && authUserId) {
-    const subscriptions = userDao.getUserFollowingIds(authUserId);
+    const subscriptions = await userDao.getUserFollowingIds(authUserId);
     followedUsersIds = subscriptions.map((sub) => sub.userId);
+
+    if (followedUsersIds.length === 0) {
+      return res.status(200).json([]);
+    }
   }
 
   const recipes = await recipeDao.getAllRecipes(
@@ -246,17 +275,28 @@ const getLikedRecipes = async (req, res) => {
   const { search } = req.query;
   const authUserId = req.user?.id;
 
-  const recipes = await recipeDao.getUserLikedRecipes(authUserId, search);
+  const recipes = await recipeDao.getUserLikedRecipes(
+    authUserId,
+    req.user,
+    search,
+  );
   res.status(200).json(recipes);
+};
+
+const getAllRecipesUniqueIngredients = async (req, res) => {
+  const ingredients = await recipeDao.getAllRecipesUniqueIngredients();
+  res.status(200).json(ingredients);
 };
 
 module.exports = {
   createRecipe,
   updateRecipe,
   getRecipeById,
+  getRecipeByIdToEdit,
   getRecipes,
   deleteRecipe,
   likeRecipe,
   unlikeRecipe,
   getLikedRecipes,
+  getAllRecipesUniqueIngredients,
 };

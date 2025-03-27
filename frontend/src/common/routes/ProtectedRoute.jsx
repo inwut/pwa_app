@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../components/auth/AuthProvider.jsx";
+import { useAuth } from "../providers/AuthProvider.jsx";
 
 const ProtectedRoute = ({ allowedRoles, children }) => {
   const { currentUser } = useAuth();
