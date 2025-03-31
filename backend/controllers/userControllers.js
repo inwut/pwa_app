@@ -73,9 +73,9 @@ const me = (req, res) => {
 };
 
 const getUsers = async (req, res) => {
-  const { search } = req.query;
+  const { search, limit, offset } = req.query;
 
-  const users = await userDao.getAllUsers(search);
+  const users = await userDao.getAllUsers(search, limit, offset);
   res.status(200).json(users);
 };
 
@@ -116,27 +116,27 @@ const getUserById = async (req, res) => {
 
 const getUserFollowing = async (req, res) => {
   const userId = req.params.id;
-  const { search } = req.query;
+  const { search, limit, offset } = req.query;
 
   const user = await userDao.getUserById(userId);
   if (!user) {
     throw new AppError("User not found", 404);
   }
 
-  const following = await userDao.getUserFollowing(user, search);
+  const following = await userDao.getUserFollowing(user, search, limit, offset);
   res.status(200).json([...following]);
 };
 
 const getUserFollowers = async (req, res) => {
   const userId = req.params.id;
-  const { search } = req.query;
+  const { search, limit, offset } = req.query;
 
   const user = await userDao.getUserById(userId);
   if (!user) {
     throw new AppError("User not found", 404);
   }
 
-  const followers = await userDao.getUserFollowers(user, search);
+  const followers = await userDao.getUserFollowers(user, search, limit, offset);
   res.status(200).json([...followers]);
 };
 

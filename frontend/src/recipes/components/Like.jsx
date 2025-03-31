@@ -10,7 +10,15 @@ import "./Like.css";
 import { useAuth } from "../../common/providers/AuthProvider.jsx";
 import { useError } from "../../common/providers/ErrorProvider.jsx";
 
-const Like = ({ isLiked = false, recipeId, likes, reloadData, disabled }) => {
+const Like = ({
+  isLiked = false,
+  recipeId,
+  likes,
+  updateRecipesData,
+  updateFavoritesData,
+  updateRecipeData,
+  disabled,
+}) => {
   const { currentUser } = useAuth();
   const { showError } = useError();
   const navigate = useNavigate();
@@ -24,7 +32,15 @@ const Like = ({ isLiked = false, recipeId, likes, reloadData, disabled }) => {
         } else {
           await api.delete(`recipes/${recipeId}/like`);
         }
-        await reloadData();
+        if (updateRecipesData) {
+          await updateRecipesData(recipeId, newLiked);
+        }
+        if (updateRecipeData) {
+          await updateRecipeData();
+        }
+        if (updateFavoritesData) {
+          await updateFavoritesData();
+        }
       } catch (error) {
         showError(error);
       }

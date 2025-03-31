@@ -7,7 +7,10 @@ const {
   recipeDataValidator,
   recipesParamsValidator,
 } = require("../middlewares/validators/recipeValidators");
-const { idValidator } = require("../middlewares/validators/idValidator");
+const {
+  idValidator,
+  limitOffsetValidator,
+} = require("../middlewares/validators/commonValidators");
 const validationHandler = require("../middlewares/validationHandler");
 const {
   createRecipe,
@@ -28,6 +31,7 @@ router.get(
   "/",
   optionalAuth,
   recipesParamsValidator,
+  limitOffsetValidator,
   validationHandler,
   catchAsyncHandler(getRecipes),
 );
@@ -45,6 +49,8 @@ router.post(
 router.get(
   "/liked",
   auth,
+  limitOffsetValidator,
+  validationHandler,
   restrictByRole("user"),
   catchAsyncHandler(getLikedRecipes),
 );

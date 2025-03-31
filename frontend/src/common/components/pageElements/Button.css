@@ -52,7 +52,7 @@
 }
 
 @media (min-width: 800px) {
-    .button--filled:hover {
+    .button--filled:active {
         transform: scale(0.8);
     }
 

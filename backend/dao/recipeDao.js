@@ -88,7 +88,14 @@ const isRecipeLikedByUser = async (recipe, userId) => {
   return await callDbHandler(() => recipe.hasLike(userId));
 };
 
-const getAllRecipes = async (search, following, ingredients, authUserId) => {
+const getAllRecipes = async (
+  search,
+  following,
+  ingredients,
+  limit,
+  offset,
+  authUserId,
+) => {
   return await callDbHandler(() =>
     Recipe.scope("withAuthorAndLikesCount").findAll({
       attributes: [
@@ -123,6 +130,8 @@ const getAllRecipes = async (search, following, ingredients, authUserId) => {
           ),
         }),
       },
+      offset,
+      limit,
     }),
   );
 };
@@ -150,7 +159,7 @@ const getUserRecipes = async (userId, authUserId) => {
   );
 };
 
-const getUserLikedRecipes = async (userId, user, search) => {
+const getUserLikedRecipes = async (userId, user, search, limit, offset) => {
   return await callDbHandler(() =>
     user.getLikedRecipes({
       ...Recipe.options.scopes.withAuthorAndLikesCount,
@@ -167,6 +176,8 @@ const getUserLikedRecipes = async (userId, user, search) => {
       },
       joinTableAttributes: [],
       where: search ? { name: { [Op.iLike]: `%${search}%` } } : {},
+      limit,
+      offset,
     }),
   );
 };

@@ -29,7 +29,7 @@ const getUserFollowingIds = async (userId) => {
   );
 };
 
-const getAllUsers = async (search) => {
+const getAllUsers = async (search, limit, offset) => {
   return await callDbHandler(() =>
     User.scope("withLikesAndFollowersCount").findAll({
       where: {
@@ -37,6 +37,8 @@ const getAllUsers = async (search) => {
         role: "user",
       },
       order: [[col("followersCount"), "DESC"]],
+      limit,
+      offset,
     }),
   );
 };
@@ -53,24 +55,26 @@ const isUserFollowingUser = async (followerId, user) => {
   return await callDbHandler(() => user.hasSubscriber(followerId));
 };
 
-const getUserFollowsQuery = (search) => {
+const getUserFollowsQuery = (search, limit, offset) => {
   return {
     ...User.options.scopes.withLikesAndFollowersCount,
     joinTableAttributes: [],
     where: search ? { username: { [Op.iLike]: `%${search}%` } } : {},
     order: [[col("subscription.createdAt"), "DESC"]],
+    limit,
+    offset,
   };
 };
 
-const getUserFollowing = async (user, search) => {
+const getUserFollowing = async (user, search, limit, offset) => {
   return await callDbHandler(() =>
-    user.getSubscriptions(getUserFollowsQuery(search)),
+    user.getSubscriptions(getUserFollowsQuery(search, limit, offset)),
   );
 };
 
-const getUserFollowers = async (user, search) => {
+const getUserFollowers = async (user, search, limit, offset) => {
   return await callDbHandler(() =>
-    user.getSubscribers(getUserFollowsQuery(search)),
+    user.getSubscribers(getUserFollowsQuery(search, limit, offset)),
   );
 };
 

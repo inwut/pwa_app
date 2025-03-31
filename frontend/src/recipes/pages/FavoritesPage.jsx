@@ -1,30 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
 import SearchField from "../../common/components/pageElements/SearchField.jsx";
 import RecipeCardList from "../components/RecipeCardList.jsx";
 import Loader from "../../common/components/Loader.jsx";
-import useSearchInput from "../../common/hooks/useSearchInput.js";
-import useApiRequest from "../../common/hooks/useApiRequest.jsx";
+import usePaginatedData from "../../common/hooks/usePaginatedData.js";
 
 const FavoritesPage = () => {
-  const [recipes, setRecipes] = useState(null);
-  const { fetchData, isLoading } = useApiRequest();
-  const { searchInput, setSearchInput, debouncedSearchInput } =
-    useSearchInput();
+  const {
+    data: recipes,
+    isLoading,
+    searchInput,
+    setSearchInput,
+    fetchDataFromApi,
+    hasMore,
+  } = usePaginatedData("recipes/liked");
 
-  useEffect(() => {
-    fetchRecipesData();
-  }, [debouncedSearchInput]);
-
-  const fetchRecipesData = async () => {
-    const data = await fetchData("recipes/liked", {
-      params: {
-        search: debouncedSearchInput || null,
-      },
-    });
-    if (data) setRecipes(data);
+  const updateRecipeLikes = async () => {
+    await fetchDataFromApi(true);
   };
 
   return (
@@ -41,7 +35,12 @@ const FavoritesPage = () => {
         <Loader />
       ) : (
         recipes !== null && (
-          <RecipeCardList recipes={recipes} reloadRecipes={fetchRecipesData} />
+          <RecipeCardList
+            recipes={recipes}
+            updateFavoritesData={updateRecipeLikes}
+            loadMore={fetchDataFromApi}
+            hasMore={hasMore}
+          />
         )
       )}
     </>

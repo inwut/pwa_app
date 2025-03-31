@@ -116,7 +116,7 @@ const RecipePage = () => {
                   isLiked={recipe.isLiked}
                   likes={recipe.likesCount}
                   recipeId={recipe.id}
-                  reloadData={fetchRecipeData}
+                  updateRecipeData={fetchRecipeData}
                   disabled={currentUser && currentUser.role === "admin"}
                 />
               </div>

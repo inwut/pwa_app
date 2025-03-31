@@ -14,7 +14,8 @@ const RecipeCard = ({
   author,
   likes,
   isLiked,
-  reloadRecipes,
+  updateRecipesData,
+  updateFavoritesData,
 }) => {
   const { currentUser } = useAuth();
   return (
@@ -37,7 +38,8 @@ const RecipeCard = ({
           likes={likes}
           isLiked={isLiked}
           recipeId={id}
-          reloadData={reloadRecipes}
+          updateRecipesData={updateRecipesData}
+          updateFavoritesData={updateFavoritesData}
           disabled={currentUser && currentUser.role === "admin"}
         />
       </div>

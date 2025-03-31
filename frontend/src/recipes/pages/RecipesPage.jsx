@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import PageHeader from "../../common/components/pageElements/PageHeader.jsx";
 import PageTitle from "../../common/components/pageElements/PageTitle.jsx";
@@ -7,34 +7,40 @@ import CheckBox from "../../common/components/pageElements/CheckBox.jsx";
 import ProductsAutocomplete from "../components/ProductsAutocomplete.jsx";
 import RecipeCardList from "../components/RecipeCardList.jsx";
 import Loader from "../../common/components/Loader.jsx";
-import useSearchInput from "../../common/hooks/useSearchInput.js";
 import { useAuth } from "../../common/providers/AuthProvider.jsx";
-import useApiRequest from "../../common/hooks/useApiRequest.jsx";
+import usePaginatedData from "../../common/hooks/usePaginatedData.js";
 
 const RecipesPage = () => {
   const { currentUser } = useAuth();
-  const [recipes, setRecipes] = useState(null);
   const [isOnlyFollowing, setIsOnlyFollowing] = useState(false);
   const [ingredients, setIngredients] = useState([]);
-  const { fetchData, isLoading } = useApiRequest();
-  const { searchInput, setSearchInput, debouncedSearchInput } =
-    useSearchInput();
+  const {
+    data: recipes,
+    setData: setRecipes,
+    isLoading,
+    searchInput,
+    setSearchInput,
+    fetchDataFromApi,
+    hasMore,
+  } = usePaginatedData("recipes", {
+    onlyFollowing: isOnlyFollowing || null,
+    ingredients: ingredients.map((ing) => ing.name).join(",") || null,
+  });
 
-  useEffect(() => {
-    fetchRecipesData();
-  }, [debouncedSearchInput, isOnlyFollowing, ingredients]);
-
-  const fetchRecipesData = async () => {
-    const ingredientsString = ingredients.map((ing) => ing.name).join(",");
-    const data = await fetchData("recipes", {
-      params: {
-        search: debouncedSearchInput || null,
-        onlyFollowing: isOnlyFollowing || null,
-        ingredients: ingredientsString || null,
-      },
-    });
-
-    if (data) setRecipes(data);
+  const updateRecipeLikes = (recipeId, isLiked) => {
+    setRecipes((prevRecipes) =>
+      prevRecipes.map((recipe) =>
+        recipe.id === recipeId
+          ? {
+              ...recipe,
+              isLiked,
+              likesCount: isLiked
+                ? +recipe.likesCount + 1
+                : +recipe.likesCount - 1,
+            }
+          : recipe,
+      ),
+    );
   };
 
   const toggleCheckBoxHandler = () => {
@@ -69,7 +75,12 @@ const RecipesPage = () => {
         <Loader />
       ) : (
         recipes !== null && (
-          <RecipeCardList recipes={recipes} reloadRecipes={fetchRecipesData} />
+          <RecipeCardList
+            recipes={recipes}
+            updateRecipesData={updateRecipeLikes}
+            loadMore={fetchDataFromApi}
+            hasMore={hasMore}
+          />
         )
       )}
     </>

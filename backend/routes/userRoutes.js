@@ -6,7 +6,10 @@ const {
   loginValidator,
   signupValidator,
 } = require("../middlewares/validators/userValidators");
-const { idValidator } = require("../middlewares/validators/idValidator");
+const {
+  idValidator,
+  limitOffsetValidator,
+} = require("../middlewares/validators/commonValidators");
 const validationHandler = require("../middlewares/validationHandler");
 const {
   signup,
@@ -21,7 +24,12 @@ const {
 
 const router = express.Router();
 
-router.get("/", catchAsyncHandler(getUsers));
+router.get(
+  "/",
+  limitOffsetValidator,
+  validationHandler,
+  catchAsyncHandler(getUsers),
+);
 
 router.post(
   "/signup",
@@ -52,6 +60,7 @@ router.get(
 router.get(
   "/:id/following",
   idValidator,
+  limitOffsetValidator,
   validationHandler,
   catchAsyncHandler(getUserFollowing),
 );
@@ -59,6 +68,7 @@ router.get(
 router.get(
   "/:id/followers",
   idValidator,
+  limitOffsetValidator,
   validationHandler,
   catchAsyncHandler(getUserFollowers),
 );

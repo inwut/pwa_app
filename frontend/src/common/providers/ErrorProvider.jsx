@@ -8,6 +8,7 @@ export const ErrorProvider = ({ children }) => {
 
   const showError = useCallback((error) => {
     console.error(error);
+    window.scroll(0, 0);
     const errorMessage = `${error.response?.data?.error || "Something went wrong"}. Please try again!`;
     setError(errorMessage);
     setTimeout(() => setError(""), 10000);

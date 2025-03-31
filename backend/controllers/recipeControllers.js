@@ -203,7 +203,7 @@ const getRecipeByIdToEdit = async (req, res) => {
 };
 
 const getRecipes = async (req, res) => {
-  const { search, onlyFollowing, ingredients } = req.query;
+  const { search, onlyFollowing, ingredients, limit, offset } = req.query;
   const authUserId = req.user?.id;
 
   const ingredientsArray = ingredients ? ingredients.split(",") : [];
@@ -222,6 +222,8 @@ const getRecipes = async (req, res) => {
     search,
     followedUsersIds,
     ingredientsArray,
+    limit,
+    offset,
     authUserId,
   );
 
@@ -267,18 +269,25 @@ const unlikeRecipe = async (req, res) => {
   const recipeId = req.params.id;
   const authUserId = req.user?.id;
 
+  const recipe = await recipeDao.getRecipeByIdWithAuthorId(recipeId);
+  if (!recipe) {
+    throw new AppError("Recipe not found", 404);
+  }
+
   await recipeDao.unlikeRecipe(recipeId, authUserId);
-  res.status(201).json({ message: "Recipe unliked successfully" });
+  res.status(200).json({ message: "Recipe unliked successfully" });
 };
 
 const getLikedRecipes = async (req, res) => {
-  const { search } = req.query;
+  const { search, limit, offset } = req.query;
   const authUserId = req.user?.id;
 
   const recipes = await recipeDao.getUserLikedRecipes(
     authUserId,
     req.user,
     search,
+    limit,
+    offset,
   );
   res.status(200).json(recipes);
 };

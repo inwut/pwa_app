@@ -6,36 +6,24 @@ import {
   useState,
 } from "react";
 import api from "../api.js";
+import useApiRequest from "../../common/hooks/useApiRequest.jsx";
 import { useError } from "./ErrorProvider.jsx";
 
 const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState();
+  const { fetchData, isLoading } = useApiRequest();
   const { showError } = useError();
 
   useEffect(() => {
     getCurrentUser();
   }, []);
 
-  // api.interceptors.response.use(
-  //   (response) => {
-  //     return response;
-  //   },
-  //   (error) => {
-  //     if (error.response?.status === 401) {
-  //       logout().then();
-  //     }
-  //   },
-  // );
-
   const getCurrentUser = useCallback(async () => {
-    try {
-      const response = await api.get("http://localhost:5000/api/users/me");
-      setCurrentUser(response.data);
-    } catch (error) {
-      setCurrentUser(null);
-      showError(error);
+    const data = await fetchData("http://localhost:5000/api/users/me");
+    if (data) {
+      setCurrentUser(data);
     }
   }, []);
 
@@ -76,7 +64,9 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, signup, login, logout }}>
+    <AuthContext.Provider
+      value={{ currentUser, isLoading, signup, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
