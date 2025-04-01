@@ -27,7 +27,8 @@ const UserCardList = ({ users, loadMore, hasMore }) => {
       {hasMore && (
         <div className="load-more__container">
           <Button
-            text="Load more users"
+            text="Load more"
+            filled
             size="large"
             onClick={() => loadMore()}
           />

@@ -34,7 +34,7 @@ const NavLinks = ({ onLinkCLick }) => {
           </NavLink>
         </li>
       )}
-      {currentUser?.role === "user" && (
+      {currentUser && currentUser.role === "user" && (
         <li>
           <NavLink to={`/profile/${currentUser.id}`} onClick={onLinkCLick}>
             Profile

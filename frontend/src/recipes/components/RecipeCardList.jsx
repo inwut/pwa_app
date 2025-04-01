@@ -36,7 +36,8 @@ const RecipeCardList = ({
       {hasMore && (
         <div className="load-more__container">
           <Button
-            text="Load more recipes"
+            text="Load more"
+            filled
             size="large"
             onClick={() => loadMore()}
           />

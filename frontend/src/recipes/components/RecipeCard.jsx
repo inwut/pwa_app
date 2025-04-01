@@ -22,7 +22,11 @@ const RecipeCard = ({
     <div className="recipe-card">
       <Link to={`/recipes/${id}`}>
         <img
-          src={image ? `http://localhost:5000/uploads/${image}` : defaultImage}
+          src={
+            image
+              ? `${import.meta.env.VITE_API_BASE_URL}/uploads/${image}`
+              : defaultImage
+          }
           alt={name}
           className="recipe-card__image"
         />

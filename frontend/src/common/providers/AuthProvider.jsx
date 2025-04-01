@@ -6,14 +6,14 @@ import {
   useState,
 } from "react";
 import api from "../api.js";
-import useApiRequest from "../../common/hooks/useApiRequest.jsx";
 import { useError } from "./ErrorProvider.jsx";
+import { deleteFromIDB, getFromIDB, saveToIDB } from "../../utils/indexedDb.js";
 
 const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState();
-  const { fetchData, isLoading } = useApiRequest();
+  const [isLoading, setIsLoading] = useState(false);
   const { showError } = useError();
 
   useEffect(() => {
@@ -21,47 +21,67 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const getCurrentUser = useCallback(async () => {
-    const data = await fetchData("http://localhost:5000/api/users/me");
-    if (data) {
-      setCurrentUser(data);
-    }
-  }, []);
-
-  const signup = useCallback(async (username, email, password) => {
+    setIsLoading(true);
     try {
-      const response = await api.post("users/signup", {
-        username,
-        email,
-        password,
-      });
+      const response = await api.get("users/me");
       setCurrentUser(response.data);
     } catch (error) {
-      setCurrentUser(null);
-      showError(error);
+      if (error.response?.status === 401) {
+        await deleteFromIDB("users", "current");
+        setCurrentUser(null);
+      } else {
+        const cachedUser = await getFromIDB("users", "current");
+        setCurrentUser(cachedUser || null);
+      }
+    } finally {
+      setIsLoading(false);
     }
-  }, []);
+  }, [setIsLoading, setCurrentUser]);
 
-  const login = useCallback(async (email, password) => {
-    try {
-      const response = await api.post("users/login", {
-        email,
-        password,
-      });
-      setCurrentUser(response.data);
-    } catch (error) {
-      setCurrentUser(null);
-      showError(error);
-    }
-  }, []);
+  const signup = useCallback(
+    async (username, email, password) => {
+      try {
+        const response = await api.post("users/signup", {
+          username,
+          email,
+          password,
+        });
+        setCurrentUser(response.data);
+        await saveToIDB("users", "current", response.data);
+      } catch (error) {
+        setCurrentUser(null);
+        showError(error);
+      }
+    },
+    [setCurrentUser, showError],
+  );
+
+  const login = useCallback(
+    async (email, password) => {
+      try {
+        const response = await api.post("users/login", {
+          email,
+          password,
+        });
+        setCurrentUser(response.data);
+        await saveToIDB("users", "current", response.data);
+      } catch (error) {
+        setCurrentUser(null);
+        showError(error);
+      }
+    },
+    [setCurrentUser, showError],
+  );
 
   const logout = useCallback(async () => {
     try {
       await api.post("users/logout");
       setCurrentUser(null);
+      await deleteFromIDB("users", "current");
     } catch (error) {
       showError(error);
     }
-  }, []);
+  }, [setCurrentUser, showError]);
 
   return (
     <AuthContext.Provider

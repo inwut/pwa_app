@@ -30,6 +30,23 @@ const ProfilePage = () => {
     if (data) setUser(data.user);
   };
 
+  const updateRecipeLikes = (recipeId, isLiked) => {
+    setUser(({ recipes, ...rest }) => ({
+      ...rest,
+      recipes: recipes.map((recipe) =>
+        recipe.id === recipeId
+          ? {
+              ...recipe,
+              isLiked,
+              likesCount: isLiked
+                ? +recipe.likesCount + 1
+                : +recipe.likesCount - 1,
+            }
+          : recipe,
+      ),
+    }));
+  };
+
   const subscriptionHandler = async () => {
     try {
       if (user.isFollowed) {
@@ -80,7 +97,7 @@ const ProfilePage = () => {
             </Info>
             <RecipeCardList
               recipes={user.recipes}
-              reloadRecipes={fetchUserData}
+              updateRecipesData={updateRecipeLikes}
             />
             {currentUser && user.id === currentUser.id && (
               <Link to="/recipes/create">

@@ -130,7 +130,7 @@ const RecipePage = () => {
             <Image
               imageSrc={
                 recipe.image
-                  ? `http://localhost:5000/uploads/${recipe.image}`
+                  ? `${import.meta.env.VITE_API_BASE_URL}/uploads/${recipe.image}`
                   : defaultImage
               }
               altText={recipe.name}
