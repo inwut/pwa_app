@@ -7,7 +7,11 @@ import {
 } from "react";
 import api from "../api.js";
 import { useError } from "./ErrorProvider.jsx";
-import { deleteFromIDB, getFromIDB, saveToIDB } from "../../utils/indexedDb.js";
+import { getFromIDB, saveToIDB, clearIDBStore } from "../../utils/indexedDb.js";
+import {
+  cacheInitialData,
+  clearInitialData,
+} from "../../utils/cacheInitialData.js";
 
 const AuthContext = createContext(undefined);
 
@@ -27,10 +31,10 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(response.data);
     } catch (error) {
       if (error.response?.status === 401) {
-        await deleteFromIDB("users", "current");
+        await clearIDBStore("currentUser");
         setCurrentUser(null);
       } else {
-        const cachedUser = await getFromIDB("users", "current");
+        const cachedUser = await getFromIDB("currentUser", "current");
         setCurrentUser(cachedUser || null);
       }
     } finally {
@@ -47,7 +51,8 @@ export const AuthProvider = ({ children }) => {
           password,
         });
         setCurrentUser(response.data);
-        await saveToIDB("users", "current", response.data);
+        await saveToIDB("currentUser", response.data, "current");
+        await cacheInitialData(response.data.id);
       } catch (error) {
         setCurrentUser(null);
         showError(error);
@@ -64,7 +69,8 @@ export const AuthProvider = ({ children }) => {
           password,
         });
         setCurrentUser(response.data);
-        await saveToIDB("users", "current", response.data);
+        await saveToIDB("currentUser", response.data, "current");
+        await cacheInitialData(response.data.id);
       } catch (error) {
         setCurrentUser(null);
         showError(error);
@@ -77,7 +83,8 @@ export const AuthProvider = ({ children }) => {
     try {
       await api.post("users/logout");
       setCurrentUser(null);
-      await deleteFromIDB("users", "current");
+      await clearIDBStore("currentUser");
+      await clearInitialData();
     } catch (error) {
       showError(error);
     }

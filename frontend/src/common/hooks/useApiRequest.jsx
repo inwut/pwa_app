@@ -1,10 +1,8 @@
 import { useState, useRef } from "react";
 import api from "../api.js";
-import { useError } from "../providers/ErrorProvider.jsx";
 
 const useApiRequest = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { showError } = useError();
   const abortControllerRef = useRef(null);
 
   const fetchData = async (url, options = {}) => {
@@ -21,7 +19,6 @@ const useApiRequest = () => {
     } catch (error) {
       console.error(error);
       if (error.name === "CanceledError") return null;
-      showError(error);
       return null;
     } finally {
       setIsLoading(false);

@@ -17,6 +17,7 @@ import StyledTextField from "../../common/components/pageElements/StyledTextFiel
 import Loader from "../../common/components/Loader.jsx";
 import useApiRequest from "../../common/hooks/useApiRequest.jsx";
 import { useError } from "../../common/providers/ErrorProvider.jsx";
+import { getFromIDB } from "../../utils/indexedDb.js";
 
 const CreateRecipePage = () => {
   const recipeId = useParams().recipeId;
@@ -52,7 +53,17 @@ const CreateRecipePage = () => {
 
   const fetchRecipeData = async () => {
     const data = await fetchData(`recipes/edit/${recipeId}`);
-    if (data) setFetchedRecipe(data.recipe);
+    if (data) {
+      setFetchedRecipe(data.recipe);
+    } else {
+      const profile = await getFromIDB("profile", "me");
+      if (profile) {
+        const recipe = profile.recipes.find((r) => r.id === recipeId);
+        setFetchedRecipe(recipe);
+      } else {
+        setFetchedRecipe(null);
+      }
+    }
   };
 
   const setValues = () => {

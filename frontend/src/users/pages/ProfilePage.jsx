@@ -13,6 +13,7 @@ import Loader from "../../common/components/Loader.jsx";
 import useApiRequest from "../../common/hooks/useApiRequest.jsx";
 import { useAuth } from "../../common/providers/AuthProvider.jsx";
 import { useError } from "../../common/providers/ErrorProvider.jsx";
+import { saveToIDB, getFromIDB } from "../../utils/indexedDb.js";
 
 const ProfilePage = () => {
   const userId = useParams().userId;
@@ -23,11 +24,25 @@ const ProfilePage = () => {
 
   useEffect(() => {
     fetchUserData();
-  }, [userId]);
+  }, [currentUser, userId]);
 
   const fetchUserData = async () => {
     const data = await fetchData(`users/${userId}`);
-    if (data) setUser(data.user);
+    if (data) {
+      setUser(data.user);
+      if (currentUser && currentUser.id === +userId) {
+        await saveToIDB("profile", data.user, "me");
+      }
+    } else if (currentUser && currentUser.id === +userId) {
+      const cachedData = await getFromIDB("profile", "me");
+      if (cachedData) {
+        setUser(cachedData);
+      } else {
+        setUser(null);
+      }
+    } else {
+      setUser(null);
+    }
   };
 
   const updateRecipeLikes = (recipeId, isLiked) => {
@@ -70,47 +85,49 @@ const ProfilePage = () => {
     <>
       {isLoading ? (
         <Loader />
-      ) : (
-        user !== null && (
-          <>
-            <PageHeader>
-              <PageTitle text={`@${user.username}`} />
-              {currentUser &&
-                currentUser.role === "user" &&
-                user.id !== currentUser.id && (
-                  <Button
-                    text={user.isFollowed ? "Unfollow" : "Follow"}
-                    filled
-                    size="large"
-                    onClick={subscriptionHandler}
-                  />
-                )}
-            </PageHeader>
-            <Info>
-              <span>{user.recipes.length} Recipes</span>
-              <Link to="followers">
-                <Button text={`${user.followersCount} Followers`} />
-              </Link>
-              <Link to="following">
-                <Button text={`${user.followingCount} Following`} />
-              </Link>
-            </Info>
-            <RecipeCardList
-              recipes={user.recipes}
-              updateRecipesData={updateRecipeLikes}
-            />
-            {currentUser && user.id === currentUser.id && (
-              <Link to="/recipes/create">
+      ) : user !== null ? (
+        <>
+          <PageHeader>
+            <PageTitle text={`@${user.username}`} />
+            {currentUser &&
+              currentUser.role === "user" &&
+              user.id !== currentUser.id && (
                 <Button
+                  text={user.isFollowed ? "Unfollow" : "Follow"}
                   filled
-                  icon={<AddIcon />}
                   size="large"
-                  classNames="profile__add-button"
+                  onClick={subscriptionHandler}
                 />
-              </Link>
-            )}
-          </>
-        )
+              )}
+          </PageHeader>
+          <Info>
+            <span>{user.recipeCount} Recipes</span>
+            <Link to="followers">
+              <Button text={`${user.followersCount} Followers`} />
+            </Link>
+            <Link to="following">
+              <Button text={`${user.followingCount} Following`} />
+            </Link>
+          </Info>
+          <RecipeCardList
+            recipes={user.recipes}
+            updateRecipesData={updateRecipeLikes}
+          />
+          {currentUser && user.id === currentUser.id && (
+            <Link to="/recipes/create">
+              <Button
+                filled
+                icon={<AddIcon />}
+                size="large"
+                classNames="profile__add-button"
+              />
+            </Link>
+          )}
+        </>
+      ) : (
+        <p className="text--primary text--filler">
+          Oops... No profile found. Maybe try again later.
+        </p>
       )}
     </>
   );

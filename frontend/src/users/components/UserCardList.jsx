@@ -8,7 +8,7 @@ const UserCardList = ({ users, loadMore, hasMore }) => {
   return (
     <>
       <section className="user-card-list">
-        {users.length ? (
+        {users && users.length ? (
           users.map((user) => (
             <UserCard
               key={user.id}
@@ -20,11 +20,11 @@ const UserCardList = ({ users, loadMore, hasMore }) => {
           ))
         ) : (
           <p className="text--primary text--filler">
-            Oops... No users found for this request.
+            Oops... No users found. Maybe try again later.
           </p>
         )}
       </section>
-      {hasMore && (
+      {users && hasMore && (
         <div className="load-more__container">
           <Button
             text="Load more"

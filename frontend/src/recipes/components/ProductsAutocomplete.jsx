@@ -4,6 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import "./ProductsAutocomplete.css";
 import useApiRequest from "../../common/hooks/useApiRequest.jsx";
+import { saveArrayToIDB, getAllFromIDB } from "../../utils/indexedDb.js";
 
 const ProductsAutocomplete = ({ onIngredientsChange }) => {
   const [ingredients, setIngredients] = useState([]);
@@ -36,7 +37,17 @@ const ProductsAutocomplete = ({ onIngredientsChange }) => {
 
   const fetchIngredients = async () => {
     const data = await fetchData("recipes/ingredients");
-    if (data) setIngredients(data);
+    if (data) {
+      setIngredients(data);
+      await saveArrayToIDB("ingredients", data);
+    } else {
+      const cachedData = await getAllFromIDB("ingredients");
+      if (cachedData) {
+        setIngredients(cachedData);
+      } else {
+        setIngredients([]);
+      }
+    }
   };
 
   return (

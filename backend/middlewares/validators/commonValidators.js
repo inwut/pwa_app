@@ -11,4 +11,19 @@ const limitOffsetValidator = [
     .withMessage("Offset must be a non-negative integer"),
 ];
 
-module.exports = { idValidator, limitOffsetValidator };
+const optionalLimitOffsetValidator = [
+  query("limit")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Limit must be a positive integer"),
+  query("offset")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Offset must be a non-negative integer"),
+];
+
+module.exports = {
+  idValidator,
+  limitOffsetValidator,
+  optionalLimitOffsetValidator,
+};

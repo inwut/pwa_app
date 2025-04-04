@@ -15,7 +15,7 @@ const FavoritesPage = () => {
     setSearchInput,
     fetchDataFromApi,
     hasMore,
-  } = usePaginatedData("recipes/liked");
+  } = usePaginatedData("recipes/liked", "favorites");
 
   const updateRecipeLikes = async () => {
     await fetchDataFromApi(true);

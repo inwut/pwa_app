@@ -99,6 +99,7 @@ const getUserById = async (req, res) => {
       id: user.id,
       username: user.username,
       recipes,
+      recipeCount: recipes.length,
       followersCount,
       followingCount,
     },

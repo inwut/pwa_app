@@ -18,11 +18,12 @@ const RecipesPage = () => {
     data: recipes,
     setData: setRecipes,
     isLoading,
+    isFromCache,
     searchInput,
     setSearchInput,
     fetchDataFromApi,
     hasMore,
-  } = usePaginatedData("recipes", {
+  } = usePaginatedData("recipes", "recipes", {
     onlyFollowing: isOnlyFollowing || null,
     ingredients: ingredients.map((ing) => ing.name).join(",") || null,
   });
@@ -61,7 +62,7 @@ const RecipesPage = () => {
             value={searchInput}
             onSearch={(e) => setSearchInput(e.target.value)}
           />
-          {currentUser && (
+          {currentUser && !isFromCache && (
             <CheckBox
               label="Only following"
               onCheck={toggleCheckBoxHandler}
@@ -74,14 +75,12 @@ const RecipesPage = () => {
       {isLoading ? (
         <Loader />
       ) : (
-        recipes !== null && (
-          <RecipeCardList
-            recipes={recipes}
-            updateRecipesData={updateRecipeLikes}
-            loadMore={fetchDataFromApi}
-            hasMore={hasMore}
-          />
-        )
+        <RecipeCardList
+          recipes={recipes}
+          updateRecipesData={updateRecipeLikes}
+          loadMore={fetchDataFromApi}
+          hasMore={hasMore}
+        />
       )}
     </>
   );

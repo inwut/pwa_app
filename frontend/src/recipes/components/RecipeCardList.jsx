@@ -13,7 +13,7 @@ const RecipeCardList = ({
   return (
     <>
       <section className="recipe-card-list">
-        {recipes.length ? (
+        {recipes && recipes.length ? (
           recipes.map((recipe) => (
             <RecipeCard
               key={recipe.id}
@@ -29,11 +29,11 @@ const RecipeCardList = ({
           ))
         ) : (
           <p className="text--primary text--filler">
-            Oops... No recipes found for this request.
+            Oops... No recipes found. Maybe try again later.
           </p>
         )}
       </section>
-      {hasMore && (
+      {recipes && hasMore && (
         <div className="load-more__container">
           <Button
             text="Load more"

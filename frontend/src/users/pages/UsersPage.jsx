@@ -10,12 +10,8 @@ import usePaginatedData from "../../common/hooks/usePaginatedData.js";
 
 const UsersPage = ({ type }) => {
   const userId = useParams().userId;
-  const endpoint =
-    type === "following"
-      ? `users/${userId}/following`
-      : type === "followers"
-        ? `users/${userId}/followers`
-        : "users";
+  const endpoint = userId ? `/users/${userId}/${type}` : "/users";
+  const IDBStore = type === "users" ? type : null;
   const {
     data: users,
     isLoading,
@@ -23,7 +19,7 @@ const UsersPage = ({ type }) => {
     setSearchInput,
     fetchDataFromApi,
     hasMore,
-  } = usePaginatedData(endpoint);
+  } = usePaginatedData(endpoint, IDBStore, { type });
 
   return (
     <>
@@ -40,13 +36,11 @@ const UsersPage = ({ type }) => {
       {isLoading ? (
         <Loader />
       ) : (
-        users !== null && (
-          <UserCardList
-            users={users}
-            loadMore={fetchDataFromApi}
-            hasMore={hasMore}
-          />
-        )
+        <UserCardList
+          users={users}
+          loadMore={fetchDataFromApi}
+          hasMore={hasMore}
+        />
       )}
     </>
   );

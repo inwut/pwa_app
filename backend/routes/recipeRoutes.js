@@ -10,6 +10,7 @@ const {
 const {
   idValidator,
   limitOffsetValidator,
+  optionalLimitOffsetValidator,
 } = require("../middlewares/validators/commonValidators");
 const validationHandler = require("../middlewares/validationHandler");
 const {
@@ -49,7 +50,7 @@ router.post(
 router.get(
   "/liked",
   auth,
-  limitOffsetValidator,
+  optionalLimitOffsetValidator,
   validationHandler,
   restrictByRole("user"),
   catchAsyncHandler(getLikedRecipes),
