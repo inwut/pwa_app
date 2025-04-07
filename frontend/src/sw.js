@@ -1,10 +1,11 @@
 import {
   cleanupOutdatedCaches,
+  createHandlerBoundToURL,
   matchPrecache,
   precacheAndRoute,
 } from "workbox-precaching";
 import { clientsClaim } from "workbox-core";
-import { registerRoute } from "workbox-routing";
+import { NavigationRoute, registerRoute } from "workbox-routing";
 import { googleFontsCache } from "workbox-recipes";
 import { CacheFirst } from "workbox-strategies";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
@@ -17,12 +18,7 @@ googleFontsCache();
 self.skipWaiting();
 clientsClaim();
 
-registerRoute(
-  ({ request }) => request.mode === "navigate",
-  async () => {
-    return await matchPrecache("/index.html");
-  },
-);
+registerRoute(new NavigationRoute(createHandlerBoundToURL("/index.html")));
 
 registerRoute(
   ({ request }) =>

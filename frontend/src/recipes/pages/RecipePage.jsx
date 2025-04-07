@@ -21,7 +21,7 @@ import defaultImage from "../../assets/defaultRecipeImage.jpg";
 import useApiRequest from "../../common/hooks/useApiRequest.jsx";
 import { useAuth } from "../../common/providers/AuthProvider.jsx";
 import { useError } from "../../common/providers/ErrorProvider.jsx";
-import { saveToIDB, getFromIDB } from "../../utils/indexedDb.js";
+import { saveToIDB, getFromIDB, getAllFromIDB } from "../../utils/indexedDb.js";
 
 const RecipePage = () => {
   const recipeId = useParams().recipeId;
@@ -37,18 +37,58 @@ const RecipePage = () => {
     fetchRecipeData();
   }, []);
 
+  const getCachedData = async () => {
+    let cachedData = await getFromIDB("recipes", +recipeId);
+    if (!cachedData || !cachedData.ingredients) {
+      cachedData = await getFromIDB("favorites", +recipeId);
+    }
+    if (!cachedData) {
+      const profile = await getFromIDB("profile", "me");
+      if (profile) {
+        cachedData = profile.recipes.find((recipe) => recipe.id === +recipeId);
+      }
+    }
+    if (cachedData && cachedData.ingredients) {
+      return cachedData;
+    } else {
+      return null;
+    }
+  };
+
+  const cacheData = async (recipe) => {
+    const favorites = await getAllFromIDB("favorites");
+    const favoritesIds = favorites.map((f) => f.id);
+    if (favoritesIds.includes(recipe.id)) {
+      await saveToIDB("favorites", recipe);
+    }
+
+    const profile = await getFromIDB("profile", "me");
+    if (profile) {
+      const recipes = profile.recipes || [];
+      const recipesIds = recipes.map((recipe) => recipe.id);
+      if (recipesIds.includes(recipe.id)) {
+        profile.recipes = recipes.map((r) =>
+          r.id === recipe.id ? { ...r, ...recipe } : r,
+        );
+        await saveToIDB("profile", profile, "me");
+      }
+    }
+
+    const allRecipes = await getAllFromIDB("recipes");
+    const recipesIds = allRecipes.map((r) => r.id);
+    if (recipesIds.includes(recipe.id)) {
+      await saveToIDB("recipes", recipe);
+    }
+  };
+
   const fetchRecipeData = async () => {
     const data = await fetchData(`recipes/${recipeId}`);
     if (data) {
       setRecipe(data.recipe);
-      await saveToIDB("recipes", data.recipe);
+      await cacheData(data.recipe);
     } else {
-      const cachedData = await getFromIDB("recipes", +recipeId);
-      if (cachedData && cachedData.ingredients) {
-        setRecipe(cachedData);
-      } else {
-        setRecipe(null);
-      }
+      const cachedData = await getCachedData();
+      setRecipe(cachedData);
     }
   };
 

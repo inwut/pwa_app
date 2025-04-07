@@ -3,7 +3,7 @@ const { body } = require("express-validator");
 const commentDataValidator = [
   body("content")
     .trim()
-    .escape()
+    .customSanitizer((value) => value.replace(/[<>]/g, ""))
     .notEmpty()
     .withMessage("Comment content is required"),
   body("recipeId").isInt({ min: 1 }).withMessage("Invalid recipe ID"),

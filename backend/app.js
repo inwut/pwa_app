@@ -18,7 +18,7 @@ const PORT = process.env.APP_PORT || 5000;
 const app = express();
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: process.env.CLIENT_ORIGIN,
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 };
@@ -33,7 +33,7 @@ app.use(
     limits: { fileSize: 50 * 1024 * 1024 },
     safeFileNames: true,
     limitHandler: (req, res, next) => {
-      throw new AppError("File size exceeds the limit", 413);
+      res.status(413).json({ error: "File size exceeds the limit" });
     },
   }),
 );

@@ -5,12 +5,12 @@ const AppError = require("../../utils/appError");
 const recipeDataValidator = [
   body("name")
     .trim()
-    .escape()
+    .customSanitizer((value) => value.replace(/[<>]/g, ""))
     .notEmpty()
     .withMessage("Recipe name is required"),
   body("instructions")
     .trim()
-    .escape()
+    .customSanitizer((value) => value.replace(/[<>]/g, ""))
     .notEmpty()
     .withMessage("Instructions are required"),
   body("ingredients")

@@ -44,6 +44,7 @@ export const AuthProvider = ({ children }) => {
 
   const signup = useCallback(
     async (username, email, password) => {
+      setIsLoading(true);
       try {
         const response = await api.post("users/signup", {
           username,
@@ -56,13 +57,16 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         setCurrentUser(null);
         showError(error);
+      } finally {
+        setIsLoading(false);
       }
     },
-    [setCurrentUser, showError],
+    [setCurrentUser, showError, setIsLoading],
   );
 
   const login = useCallback(
     async (email, password) => {
+      setIsLoading(true);
       try {
         const response = await api.post("users/login", {
           email,
@@ -74,9 +78,11 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         setCurrentUser(null);
         showError(error);
+      } finally {
+        setIsLoading(false);
       }
     },
-    [setCurrentUser, showError],
+    [setCurrentUser, showError, setIsLoading],
   );
 
   const logout = useCallback(async () => {

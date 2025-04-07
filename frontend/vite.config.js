@@ -35,7 +35,7 @@ export default defineConfig({
         name: "Recipegram",
         short_name: "Recipegram",
         description:
-          "A progressive web app for sharing and discovering recipes.",
+          "A progressive web app for sharing your favorite recipes and discovering new ones.",
         theme_color: "#476730",
         background_color: "#f9faef",
         icons: [

@@ -1,13 +1,9 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider.jsx";
-import Loader from "../components/Loader.jsx";
 
 const ProtectedRoute = ({ allowedRoles, children }) => {
-  const { currentUser, isLoading } = useAuth();
+  const { currentUser } = useAuth();
 
-  if (isLoading) {
-    return <Loader />;
-  }
   if (currentUser === null) {
     return <Navigate to="/auth" replace />;
   }

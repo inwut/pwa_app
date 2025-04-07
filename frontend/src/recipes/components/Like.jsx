@@ -9,6 +9,7 @@ import api from "../../common/api.js";
 import "./Like.css";
 import { useAuth } from "../../common/providers/AuthProvider.jsx";
 import { useError } from "../../common/providers/ErrorProvider.jsx";
+import { saveToIDB, deleteFromIDB } from "../../utils/indexedDb.js";
 
 const Like = ({
   isLiked = false,
@@ -29,8 +30,11 @@ const Like = ({
       try {
         if (newLiked) {
           await api.post(`recipes/${recipeId}/like`);
+          const updatedRecipe = await api.get(`recipes/${recipeId}`);
+          await saveToIDB("favorites", updatedRecipe.data.recipe);
         } else {
           await api.delete(`recipes/${recipeId}/like`);
+          await deleteFromIDB("favorites", +recipeId);
         }
         if (updateRecipesData) {
           await updateRecipesData(recipeId, newLiked);

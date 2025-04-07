@@ -17,7 +17,7 @@ const loginValidator = [
 const signupValidator = [
   body("username")
     .trim()
-    .escape()
+    .customSanitizer((value) => value.replace(/[<>]/g, ""))
     .notEmpty()
     .withMessage("Username is required")
     .isLength({ min: 3, max: 20 })

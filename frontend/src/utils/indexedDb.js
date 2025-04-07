@@ -42,12 +42,22 @@ async function getIDB() {
 export async function saveToIDB(storeName, value, key = null) {
   const db = await getIDB();
   if (!db) return;
+  const tx = db.transaction(storeName, "readwrite");
+  const store = tx.objectStore(storeName);
+
+  let finalValue = value;
+  if (storeName === "recipes" || storeName === "favorites") {
+    const existingData = await store.get(value.id);
+    finalValue = mergeRecipeData(existingData, value);
+  }
 
   if (key !== null) {
-    await db.put(storeName, value, key);
+    await store.put(finalValue, key);
   } else {
-    await db.put(storeName, value);
+    await store.put(finalValue);
   }
+
+  await tx.done;
 }
 
 export async function saveArrayToIDB(storeName, dataArray) {
@@ -60,14 +70,19 @@ export async function saveArrayToIDB(storeName, dataArray) {
     let newItem = item;
     if (storeName === "recipes" || storeName === "favorites") {
       let existingData = await store.get(item.id);
-      if (existingData && existingData.ingredients && !item.ingredients) {
-        newItem = { ...existingData, ...item };
-      }
+      newItem = mergeRecipeData(existingData, item);
     }
     await store.put(newItem);
   }
 
   await tx.done;
+}
+
+function mergeRecipeData(existingData, newItem) {
+  if (existingData?.ingredients && !newItem.ingredients) {
+    return { ...existingData, ...newItem };
+  }
+  return newItem;
 }
 
 export async function getFromIDB(storeName, key) {
@@ -90,6 +105,15 @@ export async function getPagedArrayFromIDB(storeName, limit, offset = 0) {
   const allItems = await store.getAll();
 
   return allItems.slice(offset, offset + limit);
+}
+
+export async function deleteFromIDB(storeName, key) {
+  const db = await getIDB();
+  if (!db) return;
+  const tx = db.transaction(storeName, "readwrite");
+  const store = tx.objectStore(storeName);
+  await store.delete(key);
+  await tx.done;
 }
 
 export async function clearIDBStore(storeName) {

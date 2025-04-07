@@ -13,6 +13,7 @@ import ProfilePage from "../../users/pages/ProfilePage.jsx";
 import UsersPage from "../../users/pages/UsersPage.jsx";
 import NotFoundPage from "../pages/NotFoundPage.jsx";
 import NavBar from "../components/navigation/NavBar.jsx";
+import Loader from "../components/Loader.jsx";
 
 const AppLayout = () => (
   <>
@@ -24,9 +25,11 @@ const AppLayout = () => (
 );
 
 const AppRoutes = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, isLoading } = useAuth();
 
-  return (
+  return isLoading ? (
+    <Loader />
+  ) : (
     <Routes>
       <Route element={<AppLayout />}>
         <Route index element={<HomePage />} />

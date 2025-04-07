@@ -27,7 +27,7 @@ const usePaginatedData = (
     ...Object.values(extraParams),
   ]);
 
-  const applyFilters = (data, filters) => {
+  const filterCachedData = (data, filters) => {
     return data.filter((item) => {
       if (filters.search) {
         if (item.name) {
@@ -57,9 +57,14 @@ const usePaginatedData = (
     });
   };
 
+  const updatePaginationData = (newData, reset) => {
+    setData((prevState) => (reset ? newData : [...prevState, ...newData]));
+    setOffset((prevState) => (reset ? limit : prevState + limit));
+    setHasMore(newData.length === limit);
+  };
+
   const fetchDataFromApi = async (reset = false) => {
     const scrollY = window.scrollY;
-
     const response = await fetchData(endpoint, {
       params: {
         search: debouncedSearchInput || null,
@@ -71,10 +76,10 @@ const usePaginatedData = (
 
     if (response) {
       setIsFromCache(false);
-      setData((prevState) => (reset ? response : [...prevState, ...response]));
-      setOffset((prevState) => (reset ? limit : prevState + limit));
-      setHasMore(response.length === limit);
-      if (IDBStore) await saveArrayToIDB(IDBStore, response);
+      updatePaginationData(response, reset);
+      if (IDBStore) {
+        await saveArrayToIDB(IDBStore, response);
+      }
     } else if (IDBStore) {
       const cachedResponse = await getPagedArrayFromIDB(
         IDBStore,
@@ -83,15 +88,11 @@ const usePaginatedData = (
       );
       if (cachedResponse) {
         setIsFromCache(true);
-        const filteredData = applyFilters(cachedResponse, {
+        const filteredData = filterCachedData(cachedResponse, {
           search: debouncedSearchInput,
           ...extraParams,
         });
-        setData((prevState) =>
-          reset ? filteredData : [...prevState, ...filteredData],
-        );
-        setOffset((prevState) => (reset ? limit : prevState + limit));
-        setHasMore(filteredData.length === limit);
+        updatePaginationData(filteredData, reset);
       } else {
         setData(null);
       }
