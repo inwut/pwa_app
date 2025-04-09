@@ -8,7 +8,7 @@ import { FormControlLabel } from "@mui/material";
 import api from "../../common/api.js";
 import "./Like.css";
 import { useAuth } from "../../common/providers/AuthProvider.jsx";
-import { useError } from "../../common/providers/ErrorProvider.jsx";
+import { useNotification } from "../../common/providers/NotificationProvider.jsx";
 import { saveToIDB, deleteFromIDB } from "../../utils/indexedDb.js";
 
 const Like = ({
@@ -21,7 +21,7 @@ const Like = ({
   disabled,
 }) => {
   const { currentUser } = useAuth();
-  const { showError } = useError();
+  const { showError, showInfo } = useNotification();
   const navigate = useNavigate();
 
   const likeHandler = async (event) => {
@@ -46,6 +46,12 @@ const Like = ({
           await updateFavoritesData();
         }
       } catch (error) {
+        if (!navigator.onLine) {
+          showInfo(
+            "You're offline. Your like will be synced once you're back online.",
+          );
+          return;
+        }
         showError(error);
       }
     } else {

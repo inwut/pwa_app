@@ -3,40 +3,41 @@ import { openDB } from "idb";
 const DB_NAME = "pwa-app";
 const DB_VERSION = 1;
 
-let idbInstance = null;
-
-async function getIDB() {
-  if (!("indexedDB" in window)) {
+export async function getIDB() {
+  if (typeof indexedDB === "undefined") {
     return null;
   }
-  if (!idbInstance) {
-    idbInstance = await openDB(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains("currentUser")) {
-          db.createObjectStore("currentUser");
-        }
-        if (!db.objectStoreNames.contains("appData")) {
-          db.createObjectStore("appData");
-        }
-        if (!db.objectStoreNames.contains("profile")) {
-          db.createObjectStore("profile");
-        }
-        if (!db.objectStoreNames.contains("favorites")) {
-          db.createObjectStore("favorites", { keyPath: "id" });
-        }
-        if (!db.objectStoreNames.contains("recipes")) {
-          db.createObjectStore("recipes", { keyPath: "id" });
-        }
-        if (!db.objectStoreNames.contains("ingredients")) {
-          db.createObjectStore("ingredients", { keyPath: "name" });
-        }
-        if (!db.objectStoreNames.contains("users")) {
-          db.createObjectStore("users", { keyPath: "id" });
-        }
-      },
-    });
-  }
-  return idbInstance;
+  return await openDB(DB_NAME, DB_VERSION, {
+    upgrade(db) {
+      if (!db.objectStoreNames.contains("currentUser")) {
+        db.createObjectStore("currentUser");
+      }
+      if (!db.objectStoreNames.contains("appData")) {
+        db.createObjectStore("appData");
+      }
+      if (!db.objectStoreNames.contains("profile")) {
+        db.createObjectStore("profile");
+      }
+      if (!db.objectStoreNames.contains("favorites")) {
+        db.createObjectStore("favorites", { keyPath: "id" });
+      }
+      if (!db.objectStoreNames.contains("recipes")) {
+        db.createObjectStore("recipes", { keyPath: "id" });
+      }
+      if (!db.objectStoreNames.contains("ingredients")) {
+        db.createObjectStore("ingredients", { keyPath: "name" });
+      }
+      if (!db.objectStoreNames.contains("users")) {
+        db.createObjectStore("users", { keyPath: "id" });
+      }
+      if (!db.objectStoreNames.contains("deferredQueue")) {
+        db.createObjectStore("deferredQueue", {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+      }
+    },
+  });
 }
 
 export async function saveToIDB(storeName, value, key = null) {
@@ -49,6 +50,11 @@ export async function saveToIDB(storeName, value, key = null) {
   if (storeName === "recipes" || storeName === "favorites") {
     const existingData = await store.get(value.id);
     finalValue = mergeRecipeData(existingData, value);
+  }
+
+  if (storeName === "profile") {
+    const existingData = await store.get(key);
+    finalValue = mergeProfileData(existingData, value);
   }
 
   if (key !== null) {
@@ -83,6 +89,20 @@ function mergeRecipeData(existingData, newItem) {
     return { ...existingData, ...newItem };
   }
   return newItem;
+}
+
+function mergeProfileData(existingProfile, newProfile) {
+  return {
+    ...newProfile,
+    recipes: newProfile.recipes.map((newRecipe) => {
+      const existingRecipe = existingProfile.recipes.find(
+        (r) => r.id === newRecipe.id,
+      );
+      return existingRecipe
+        ? mergeRecipeData(existingRecipe, newRecipe)
+        : newRecipe;
+    }),
+  };
 }
 
 export async function getFromIDB(storeName, key) {

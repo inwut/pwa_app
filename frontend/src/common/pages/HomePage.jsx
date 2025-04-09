@@ -23,8 +23,8 @@ const HomePage = () => {
           recipes, like, comment, and follow other users.
         </li>
         <li>
-          <span>Offline Support</span> <LunchDiningIcon /> Add and access
-          recipes even without an internet connection.
+          <span>Offline Support</span> <LunchDiningIcon /> Access recipes even
+          without an internet connection.
         </li>
         <li>
           <span>Stay Updated</span> <IcecreamIcon /> Get push notifications for

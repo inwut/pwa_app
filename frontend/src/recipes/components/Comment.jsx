@@ -9,11 +9,11 @@ import Info from "../../common/components/pageElements/Info.jsx";
 import StyledTextField from "../../common/components/pageElements/StyledTextField.jsx";
 import api from "../../common/api.js";
 import { useAuth } from "../../common/providers/AuthProvider.jsx";
-import { useError } from "../../common/providers/ErrorProvider.jsx";
+import { useNotification } from "../../common/providers/NotificationProvider.jsx";
 
 const Comment = ({ isParent, comment, recipeId, reloadData }) => {
   const { currentUser } = useAuth();
-  const { showError } = useError();
+  const { showError, showInfo } = useNotification();
   const [reply, setReply] = useState("");
   const [showReplyField, setShowReplyField] = useState(false);
 
@@ -22,6 +22,7 @@ const Comment = ({ isParent, comment, recipeId, reloadData }) => {
   };
 
   const sendReplyHandler = async () => {
+    const scrollY = window.scrollY;
     try {
       await api.post("comments/", {
         content: reply,
@@ -29,10 +30,20 @@ const Comment = ({ isParent, comment, recipeId, reloadData }) => {
         commentId: comment.id,
       });
       await reloadData();
+      setTimeout(() => {
+        window.scrollTo(0, scrollY);
+      }, 0);
+    } catch (error) {
+      if (!navigator.onLine) {
+        showInfo(
+          "You're offline. Your reply will be sent once you're back online.",
+        );
+        return;
+      }
+      showError(error);
+    } finally {
       setReply("");
       setShowReplyField(false);
-    } catch (error) {
-      showError(error);
     }
   };
 
@@ -41,6 +52,12 @@ const Comment = ({ isParent, comment, recipeId, reloadData }) => {
       await api.delete(`comments/${comment.id}`);
       await reloadData();
     } catch (error) {
+      if (!navigator.onLine) {
+        showInfo(
+          "You're offline. Your comment will be deleted once you're back online.",
+        );
+        return;
+      }
       showError(error);
     }
   };

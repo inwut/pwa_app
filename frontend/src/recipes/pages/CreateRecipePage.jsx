@@ -16,8 +16,8 @@ import Image from "../../common/components/pageElements/Image.jsx";
 import StyledTextField from "../../common/components/pageElements/StyledTextField.jsx";
 import Loader from "../../common/components/Loader.jsx";
 import useApiRequest from "../../common/hooks/useApiRequest.jsx";
-import { useError } from "../../common/providers/ErrorProvider.jsx";
-import { getFromIDB } from "../../utils/indexedDb.js";
+import { useNotification } from "../../common/providers/NotificationProvider.jsx";
+import { deleteFromIDB, getFromIDB, saveToIDB } from "../../utils/indexedDb.js";
 
 const CreateRecipePage = () => {
   const recipeId = useParams().recipeId;
@@ -26,18 +26,39 @@ const CreateRecipePage = () => {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const { fetchData, isLoading } = useApiRequest();
-  const { showError } = useError();
+  const { showError, showInfo } = useNotification();
   const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
     setValue,
+    getValues,
     setFocus,
+    trigger,
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
   });
+
+  useEffect(() => {
+    const loadDraft = async () => {
+      const draft = await getFromIDB("appData", "draftRecipe");
+      if (draft) {
+        setValue("name", draft.name);
+        setValue("instructions", draft.instructions);
+        setIngredients(draft.ingredients || []);
+        if (draft.image) {
+          setImage(draft.image);
+          setImagePreview(URL.createObjectURL(draft.image));
+        }
+      }
+    };
+    if (!recipeId) {
+      loadDraft();
+      trigger();
+    }
+  }, []);
 
   useEffect(() => {
     if (recipeId) {
@@ -51,6 +72,25 @@ const CreateRecipePage = () => {
     }
   }, [fetchedRecipe]);
 
+  useEffect(() => {
+    if (recipeId) return;
+
+    const timeout = setTimeout(() => {
+      saveToIDB(
+        "appData",
+        {
+          name: getValues("name"),
+          instructions: getValues("instructions"),
+          ingredients,
+          image,
+        },
+        "draftRecipe",
+      );
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [getValues("name"), getValues("instructions"), ingredients, image]);
+
   const fetchRecipeData = async () => {
     const data = await fetchData(`recipes/edit/${recipeId}`);
     if (data) {
@@ -58,7 +98,7 @@ const CreateRecipePage = () => {
     } else {
       const profile = await getFromIDB("profile", "me");
       if (profile) {
-        const recipe = profile.recipes.find((r) => r.id === recipeId);
+        const recipe = profile.recipes.find((r) => r.id === +recipeId);
         setFetchedRecipe(recipe);
       } else {
         setFetchedRecipe(null);
@@ -75,9 +115,14 @@ const CreateRecipePage = () => {
       setImagePreview(`http://localhost:5000/uploads/${fetchedRecipe.image}`);
     }
     setFocus("name");
+    trigger();
   };
 
   const onSubmit = async (data) => {
+    if (!navigator.onLine) {
+      showInfo("You're offline. Please, try again once you're back online.");
+      return;
+    }
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("instructions", data.instructions);
@@ -89,13 +134,14 @@ const CreateRecipePage = () => {
       formData.append("image", image);
     }
     try {
+      let response;
       if (recipeId) {
-        await api.put(`recipes/${recipeId}`, formData);
-        navigate(`/recipes/${recipeId}`);
+        response = await api.put(`recipes/${recipeId}`, formData);
       } else {
-        const response = await api.post("recipes/", formData);
-        navigate(`/recipes/${response.data.recipe.id}`);
+        response = await api.post("recipes/", formData);
+        await deleteFromIDB("appData", "draftRecipe");
       }
+      navigate(`/recipes/${response.data.recipe.id}`);
     } catch (error) {
       showError(error);
     }

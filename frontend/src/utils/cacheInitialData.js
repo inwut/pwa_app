@@ -33,8 +33,9 @@ export const cacheInitialData = async (userId) => {
     const favoritesWithFullInfo = await fetchRecipesFullInfo(favorites.data);
     await saveArrayToIDB("favorites", favoritesWithFullInfo);
 
-    const profile = await api.get(`/users/${userId}`);
-    profile.recipes = await fetchRecipesFullInfo(profile.data.user.recipes);
+    const profileResponse = await api.get(`/users/${userId}`);
+    const profile = profileResponse.data.user;
+    profile.recipes = await fetchRecipesFullInfo(profile.recipes);
     await saveToIDB("profile", profile, "me");
   } catch (error) {
     console.error(error);

@@ -73,7 +73,7 @@ const updateRecipe = async (req, res) => {
       }
     }
 
-    await recipeDao.updateRecipe(
+    const updatedRecipe = await recipeDao.updateRecipe(
       recipe,
       {
         name,
@@ -101,7 +101,7 @@ const updateRecipe = async (req, res) => {
 
     res.status(200).json({
       message: "Recipe updated successfully",
-      recipe,
+      recipe: updatedRecipe,
     });
   });
 };
@@ -247,7 +247,9 @@ const deleteRecipe = async (req, res) => {
 
   const imagePath = recipe.image;
   await recipeDao.deleteRecipe(recipe);
-  deleteImage(path.join(__dirname, "..", "uploads", imagePath));
+  if (imagePath) {
+    deleteImage(path.join(__dirname, "..", "uploads", imagePath));
+  }
 
   res.status(200).json({ message: "Recipe deleted successfully" });
 };

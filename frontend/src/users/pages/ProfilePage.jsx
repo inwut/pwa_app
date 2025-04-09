@@ -12,14 +12,14 @@ import RecipeCardList from "../../recipes/components/RecipeCardList.jsx";
 import Loader from "../../common/components/Loader.jsx";
 import useApiRequest from "../../common/hooks/useApiRequest.jsx";
 import { useAuth } from "../../common/providers/AuthProvider.jsx";
-import { useError } from "../../common/providers/ErrorProvider.jsx";
+import { useNotification } from "../../common/providers/NotificationProvider.jsx";
 import { saveToIDB, getFromIDB } from "../../utils/indexedDb.js";
 
 const ProfilePage = () => {
   const userId = useParams().userId;
   const { currentUser } = useAuth();
   const { fetchData, isLoading } = useApiRequest();
-  const { showError } = useError();
+  const { showError } = useNotification();
   const [user, setUser] = useState(null);
 
   useEffect(() => {

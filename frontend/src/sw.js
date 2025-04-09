@@ -7,9 +7,11 @@ import {
 import { clientsClaim } from "workbox-core";
 import { NavigationRoute, registerRoute } from "workbox-routing";
 import { googleFontsCache } from "workbox-recipes";
-import { CacheFirst } from "workbox-strategies";
+import { CacheFirst, NetworkOnly } from "workbox-strategies";
 import { CacheableResponsePlugin } from "workbox-cacheable-response";
 import { ExpirationPlugin } from "workbox-expiration";
+import { BackgroundSyncPlugin } from "workbox-background-sync";
+import { addToDeferredQueue } from "./utils/deferredRequestManager.js";
 
 cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
@@ -40,4 +42,52 @@ registerRoute(
       },
     ],
   }),
+);
+
+const backgroundSyncPlugin = new BackgroundSyncPlugin("defaultQueue", {
+  maxRetentionTime: 24 * 60,
+  async onSync({ queue }) {
+    let entry;
+    while ((entry = await queue.shiftRequest())) {
+      try {
+        const response = await fetch(entry.request.clone());
+        if (response.status === 401) {
+          const cloned = entry.request.clone();
+          const body = await cloned.clone().text();
+
+          const headers = {};
+          cloned.headers.forEach((value, key) => {
+            headers[key] = value;
+          });
+
+          await addToDeferredQueue({
+            url: cloned.url,
+            method: cloned.method,
+            headers,
+            body,
+          });
+        }
+      } catch (error) {
+        console.log("Network error:", error);
+        await queue.unshiftRequest(entry);
+        break;
+      }
+    }
+  },
+});
+
+registerRoute(
+  ({ url, request }) =>
+    url.pathname.match(/\/api\/(comments|recipes\/\d+\/like)/) &&
+    request.method === "POST",
+  new NetworkOnly({ plugins: [backgroundSyncPlugin] }),
+  "POST",
+);
+
+registerRoute(
+  ({ url, request }) =>
+    url.pathname.match(/\/api\/(comments|recipes|recipes\/\d+\/like)/) &&
+    request.method === "DELETE",
+  new NetworkOnly({ plugins: [backgroundSyncPlugin] }),
+  "DELETE",
 );

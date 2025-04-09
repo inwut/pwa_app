@@ -4,17 +4,17 @@ import { BrowserRouter } from "react-router-dom";
 import "./App.css";
 import AppRoutes from "./common/routes/AppRoutes.jsx";
 import { AuthProvider } from "./common/providers/AuthProvider.jsx";
-import { ErrorProvider } from "./common/providers/ErrorProvider.jsx";
+import { NotificationProvider } from "./common/providers/NotificationProvider.jsx";
 
 const App = () => {
   return (
-    <ErrorProvider>
+    <NotificationProvider>
       <AuthProvider>
         <BrowserRouter>
           <AppRoutes />
         </BrowserRouter>
       </AuthProvider>
-    </ErrorProvider>
+    </NotificationProvider>
   );
 };
 

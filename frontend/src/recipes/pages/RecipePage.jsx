@@ -20,14 +20,14 @@ import StyledTextField from "../../common/components/pageElements/StyledTextFiel
 import defaultImage from "../../assets/defaultRecipeImage.jpg";
 import useApiRequest from "../../common/hooks/useApiRequest.jsx";
 import { useAuth } from "../../common/providers/AuthProvider.jsx";
-import { useError } from "../../common/providers/ErrorProvider.jsx";
+import { useNotification } from "../../common/providers/NotificationProvider.jsx";
 import { saveToIDB, getFromIDB, getAllFromIDB } from "../../utils/indexedDb.js";
 
 const RecipePage = () => {
   const recipeId = useParams().recipeId;
   const { currentUser } = useAuth();
   const { fetchData, isLoading } = useApiRequest();
-  const { showError } = useError();
+  const { showError, showInfo } = useNotification();
   const [recipe, setRecipe] = useState(null);
   const [comment, setComment] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -96,21 +96,39 @@ const RecipePage = () => {
     try {
       await api.delete(`recipes/${recipeId}`);
     } catch (error) {
+      if (!navigator.onLine) {
+        closeDeleteModalHandler();
+        showInfo(
+          "You're offline. Your recipe will be deleted once you're back online.",
+        );
+        return;
+      }
       showError(error);
     }
     navigate(-1);
   };
 
   const sendCommentHandler = async () => {
+    const scrollY = window.scrollY;
     try {
       await api.post("comments/", {
         content: comment,
         recipeId: recipe.id,
       });
       await fetchRecipeData();
-      setComment("");
+      setTimeout(() => {
+        window.scrollTo(0, scrollY);
+      }, 0);
     } catch (error) {
+      if (!navigator.onLine) {
+        showInfo(
+          "You're offline. Your comment will be sent once you're back online.",
+        );
+        return;
+      }
       showError(error);
+    } finally {
+      setComment("");
     }
   };
 

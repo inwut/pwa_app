@@ -5,20 +5,22 @@ import {
   useEffect,
   useState,
 } from "react";
+
 import api from "../api.js";
-import { useError } from "./ErrorProvider.jsx";
+import { useNotification } from "./NotificationProvider.jsx";
 import { getFromIDB, saveToIDB, clearIDBStore } from "../../utils/indexedDb.js";
 import {
   cacheInitialData,
   clearInitialData,
 } from "../../utils/cacheInitialData.js";
+import { replayDeferredRequests } from "../../utils/deferredRequestManager.js";
 
 const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState();
   const [isLoading, setIsLoading] = useState(false);
-  const { showError } = useError();
+  const { showError } = useNotification();
 
   useEffect(() => {
     getCurrentUser();
@@ -54,6 +56,7 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(response.data);
         await saveToIDB("currentUser", response.data, "current");
         await cacheInitialData(response.data.id);
+        await replayDeferredRequests();
       } catch (error) {
         setCurrentUser(null);
         showError(error);
@@ -75,6 +78,7 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(response.data);
         await saveToIDB("currentUser", response.data, "current");
         await cacheInitialData(response.data.id);
+        await replayDeferredRequests();
       } catch (error) {
         setCurrentUser(null);
         showError(error);
@@ -86,6 +90,7 @@ export const AuthProvider = ({ children }) => {
   );
 
   const logout = useCallback(async () => {
+    setIsLoading(true);
     try {
       await api.post("users/logout");
       setCurrentUser(null);
@@ -93,8 +98,10 @@ export const AuthProvider = ({ children }) => {
       await clearInitialData();
     } catch (error) {
       showError(error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [setCurrentUser, showError]);
+  }, [setCurrentUser, showError, setIsLoading]);
 
   return (
     <AuthContext.Provider
