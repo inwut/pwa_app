@@ -40,6 +40,11 @@ const User = sequelize.define(
       allowNull: false,
       type: DataTypes.STRING,
     },
+    pushNotificationsEnabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     freezeTableName: true,

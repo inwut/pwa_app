@@ -36,15 +36,9 @@ const Like = ({
           await api.delete(`recipes/${recipeId}/like`);
           await deleteFromIDB("favorites", +recipeId);
         }
-        if (updateRecipesData) {
-          await updateRecipesData(recipeId, newLiked);
-        }
-        if (updateRecipeData) {
-          await updateRecipeData();
-        }
-        if (updateFavoritesData) {
-          await updateFavoritesData();
-        }
+        if (updateRecipesData) await updateRecipesData(recipeId, newLiked);
+        if (updateRecipeData) await updateRecipeData();
+        if (updateFavoritesData) await updateFavoritesData();
       } catch (error) {
         if (!navigator.onLine) {
           showInfo(

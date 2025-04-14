@@ -48,9 +48,13 @@ const Comment = ({ isParent, comment, recipeId, reloadData }) => {
   };
 
   const deleteCommentHandler = async () => {
+    const scrollY = window.scrollY;
     try {
       await api.delete(`comments/${comment.id}`);
       await reloadData();
+      setTimeout(() => {
+        window.scrollTo(0, scrollY);
+      }, 0);
     } catch (error) {
       if (!navigator.onLine) {
         showInfo(
@@ -112,7 +116,14 @@ const Comment = ({ isParent, comment, recipeId, reloadData }) => {
       <div className="comment__responses">
         {isParent &&
           comment.responses &&
-          comment.responses.map((c) => <Comment key={c.id} comment={c} />)}
+          comment.responses.map((c) => (
+            <Comment
+              key={c.id}
+              comment={c}
+              recipeId={recipeId}
+              reloadData={reloadData}
+            />
+          ))}
       </div>
     </div>
   );

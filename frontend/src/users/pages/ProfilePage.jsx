@@ -10,10 +10,11 @@ import Button from "../../common/components/pageElements/Button.jsx";
 import Info from "../../common/components/pageElements/Info.jsx";
 import RecipeCardList from "../../recipes/components/RecipeCardList.jsx";
 import Loader from "../../common/components/Loader.jsx";
-import useApiRequest from "../../common/hooks/useApiRequest.jsx";
+import useApiRequest from "../../common/hooks/useApiRequest.js";
 import { useAuth } from "../../common/providers/AuthProvider.jsx";
 import { useNotification } from "../../common/providers/NotificationProvider.jsx";
 import { saveToIDB, getFromIDB } from "../../utils/indexedDb.js";
+import PushNotificationToggle from "../components/PushNotificationToggle.jsx";
 
 const ProfilePage = () => {
   const userId = useParams().userId;
@@ -65,13 +66,13 @@ const ProfilePage = () => {
   const subscriptionHandler = async () => {
     try {
       if (user.isFollowed) {
-        await api.delete(`/subscriptions`, {
+        await api.delete(`subscriptions`, {
           params: {
             userId: user.id,
           },
         });
       } else {
-        await api.post(`/subscriptions`, {
+        await api.post(`subscriptions`, {
           userId: user.id,
         });
       }
@@ -90,15 +91,17 @@ const ProfilePage = () => {
           <PageHeader>
             <PageTitle text={`@${user.username}`} />
             {currentUser &&
-              currentUser.role === "user" &&
-              user.id !== currentUser.id && (
-                <Button
-                  text={user.isFollowed ? "Unfollow" : "Follow"}
-                  filled
-                  size="large"
-                  onClick={subscriptionHandler}
-                />
-              )}
+            currentUser.role === "user" &&
+            user.id !== currentUser.id ? (
+              <Button
+                text={user.isFollowed ? "Unfollow" : "Follow"}
+                filled
+                size="large"
+                onClick={subscriptionHandler}
+              />
+            ) : (
+              <PushNotificationToggle />
+            )}
           </PageHeader>
           <Info>
             <span>{user.recipeCount} Recipes</span>

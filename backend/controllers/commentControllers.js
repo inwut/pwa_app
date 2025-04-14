@@ -1,21 +1,41 @@
 const AppError = require("../utils/appError");
 const commentDao = require("../dao/commentDao");
-const userDao = require("../dao/userDao");
 const recipeDao = require("../dao/recipeDao");
+const sendPushNotification = require("../utils/sendPushNotification");
 
 const createComment = async (req, res) => {
-  const authorId = req.user.id;
+  const author = req.user;
   const { content, recipeId, commentId } = req.body;
 
   const comment = await commentDao.createComment({
     content,
-    authorId,
+    authorId: author.id,
     recipeId,
     commentId,
   });
 
-  const commenter = await userDao.getUserById(comment.authorId);
-  const recipe = await recipeDao.getRecipeById(comment.recipeId); // для пушів
+  if (!commentId) {
+    const recipe = await recipeDao.getRecipeByIdWithAuthorId(comment.recipeId);
+
+    await sendPushNotification(recipe.author.id, {
+      title: "Someone commented your recipe!",
+      body: `@${author.username} commented your recipe "${recipe.name}"`,
+      data: {
+        url: `/recipes/${recipe.id}`,
+      },
+    });
+  } else {
+    const repliedComment = await commentDao.getCommentById(commentId);
+
+    await sendPushNotification(repliedComment.authorId, {
+      title: "Someone replied to your comment!",
+      body: `@${author.username} replied to your comment: "${repliedComment.content}"`,
+      data: {
+        url: `/recipes/${repliedComment.recipeId}`,
+      },
+    });
+  }
+
   res.status(201).json(comment);
 };
 
@@ -30,7 +50,7 @@ const deleteComment = async (req, res) => {
     throw new AppError("Comment not found", 404);
   }
 
-  if (comment.author.id !== authUserId && !isAdmin) {
+  if (comment.authorId !== authUserId && !isAdmin) {
     throw new AppError("You don't have permission to delete this comment", 403);
   }
 

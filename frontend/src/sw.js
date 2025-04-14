@@ -68,7 +68,7 @@ const backgroundSyncPlugin = new BackgroundSyncPlugin("defaultQueue", {
           });
         }
       } catch (error) {
-        console.log("Network error:", error);
+        console.error("Network error:", error);
         await queue.unshiftRequest(entry);
         break;
       }
@@ -91,3 +91,38 @@ registerRoute(
   new NetworkOnly({ plugins: [backgroundSyncPlugin] }),
   "DELETE",
 );
+
+self.addEventListener("push", (event) => {
+  const data = event.data?.json();
+  if (!data) return;
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      data: data.data || {},
+      icon: data.icon || "/pwa-192x192.png",
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url
+    ? new URL(event.notification.data.url, self.location.origin).href
+    : self.location.origin;
+
+  event.waitUntil(
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientList) => {
+        for (const client of clientList) {
+          if (client.url === targetUrl && "focus" in client) {
+            return client.focus();
+          }
+        }
+        if (clients.openWindow) {
+          return clients.openWindow(targetUrl);
+        }
+      }),
+  );
+});

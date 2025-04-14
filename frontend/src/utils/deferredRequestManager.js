@@ -1,13 +1,11 @@
-import { getIDB } from "./indexedDb.js";
+import { saveToIDB, getAllFromIDB, deleteFromIDB } from "./indexedDb.js";
 
 export const addToDeferredQueue = async (entry) => {
-  const db = await getIDB();
-  await db.add("deferredQueue", entry);
+  await saveToIDB("deferredQueue", entry);
 };
 
 export const replayDeferredRequests = async () => {
-  const db = await getIDB();
-  const allRequests = await db.getAll("deferredQueue");
+  const allRequests = await getAllFromIDB("deferredQueue");
 
   for (const req of allRequests) {
     try {
@@ -17,7 +15,7 @@ export const replayDeferredRequests = async () => {
         body: req.body,
         credentials: "include",
       });
-      await db.delete("deferredQueue", req.id);
+      await deleteFromIDB("deferredQueue", req.id);
     } catch (error) {
       console.warn("Retry failed for:", req.url);
     }

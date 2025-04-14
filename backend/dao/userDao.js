@@ -2,6 +2,7 @@ const callDbHandler = require("../utils/callDbHandler");
 const User = require("../db/models/user");
 const Subscription = require("../db/models/subscription");
 const { Op, col } = require("sequelize");
+const pushSubscriptionDao = require("../dao/pushSubscriptionDao");
 
 const createUser = async (userData) => {
   return await callDbHandler(() => User.create(userData));
@@ -10,7 +11,7 @@ const createUser = async (userData) => {
 const getUserById = async (id) => {
   return await callDbHandler(() =>
     User.findByPk(id, {
-      attributes: ["id", "username", "role"],
+      attributes: ["id", "username", "role", "pushNotificationsEnabled"],
       where: { role: "user" },
     }),
   );
@@ -18,6 +19,21 @@ const getUserById = async (id) => {
 
 const getUserByEmail = async (email) => {
   return await callDbHandler(() => User.findOne({ where: { email } }));
+};
+
+const enablePushNotifications = async (user) => {
+  user.pushNotificationsEnabled = true;
+  await callDbHandler(async () => {
+    await user.save();
+  });
+};
+
+const disablePushNotifications = async (user) => {
+  user.pushNotificationsEnabled = false;
+  await callDbHandler(async () => {
+    await user.save();
+    await pushSubscriptionDao.removeAllSubscriptions(user.id);
+  });
 };
 
 const getUserFollowingIds = async (userId) => {
@@ -108,4 +124,6 @@ module.exports = {
   isUserFollowingUser,
   followUser,
   unfollowUser,
+  enablePushNotifications,
+  disablePushNotifications,
 };

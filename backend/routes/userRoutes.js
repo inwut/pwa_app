@@ -1,7 +1,7 @@
 const express = require("express");
 
 const catchAsyncHandler = require("../utils/catchAsyncHandler");
-const { optionalAuth, auth } = require("../middlewares/auth");
+const { optionalAuth, auth, restrictByRole } = require("../middlewares/auth");
 const {
   loginValidator,
   signupValidator,
@@ -20,6 +20,8 @@ const {
   getUserById,
   getUserFollowing,
   getUserFollowers,
+  enablePushNotifications,
+  disablePushNotifications,
 } = require("../controllers/userControllers");
 
 const router = express.Router();
@@ -45,9 +47,23 @@ router.post(
   catchAsyncHandler(login),
 );
 
-router.post("/logout", logout);
+router.post("/logout", auth, catchAsyncHandler(logout));
 
-router.get("/me", auth, me);
+router.get("/me", auth, catchAsyncHandler(me));
+
+router.patch(
+  "/enablePushNotifications",
+  auth,
+  restrictByRole("user"),
+  catchAsyncHandler(enablePushNotifications),
+);
+
+router.patch(
+  "/disablePushNotifications",
+  auth,
+  restrictByRole("user"),
+  catchAsyncHandler(disablePushNotifications),
+);
 
 router.get(
   "/:id",

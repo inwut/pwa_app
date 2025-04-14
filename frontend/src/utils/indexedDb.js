@@ -54,7 +54,7 @@ export async function saveToIDB(storeName, value, key = null) {
 
   if (storeName === "profile") {
     const existingData = await store.get(key);
-    finalValue = mergeProfileData(existingData, value);
+    if (existingData) finalValue = mergeProfileData(existingData, value);
   }
 
   if (key !== null) {

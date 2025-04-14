@@ -18,11 +18,12 @@
     width: 100%;
     text-align: center;
     font-weight: 600;
-    font-size: 1.5rem;
+    font-size: 1.7rem;
 }
 
 .home-page__slogan span {
     color: #476730;
+    font-style: italic;
 }
 
 .home-page__description {

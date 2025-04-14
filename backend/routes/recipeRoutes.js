@@ -61,6 +61,7 @@ router.get("/ingredients", catchAsyncHandler(getAllRecipesUniqueIngredients));
 router.get(
   "/edit/:id",
   auth,
+  restrictByRole("user"),
   idValidator,
   catchAsyncHandler(getRecipeByIdToEdit),
 );

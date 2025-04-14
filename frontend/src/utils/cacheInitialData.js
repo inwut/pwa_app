@@ -1,5 +1,6 @@
 import {
   clearIDBStore,
+  deleteFromIDB,
   getFromIDB,
   saveArrayToIDB,
   saveToIDB,
@@ -43,5 +44,9 @@ export const cacheInitialData = async (userId) => {
 };
 
 export const clearInitialData = async () => {
-  await Promise.all([clearIDBStore("favorites"), clearIDBStore("profile")]);
+  await Promise.all([
+    clearIDBStore("favorites"),
+    clearIDBStore("profile"),
+    deleteFromIDB("appData", "firstVisit"),
+  ]);
 };

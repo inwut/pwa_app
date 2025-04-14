@@ -14,6 +14,10 @@ import {
   clearInitialData,
 } from "../../utils/cacheInitialData.js";
 import { replayDeferredRequests } from "../../utils/deferredRequestManager.js";
+import {
+  createPushSubscription,
+  deletePushSubscription,
+} from "../../utils/pushNotificationsManager.js";
 
 const AuthContext = createContext(undefined);
 
@@ -42,7 +46,17 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [setIsLoading, setCurrentUser]);
+  }, []);
+
+  const handleAuthSuccess = useCallback(
+    async (user) => {
+      setCurrentUser(user);
+      await saveToIDB("currentUser", user, "current");
+      await cacheInitialData(user.id);
+      await replayDeferredRequests();
+    },
+    [setCurrentUser],
+  );
 
   const signup = useCallback(
     async (username, email, password) => {
@@ -53,18 +67,16 @@ export const AuthProvider = ({ children }) => {
           email,
           password,
         });
-        setCurrentUser(response.data);
-        await saveToIDB("currentUser", response.data, "current");
-        await cacheInitialData(response.data.id);
-        await replayDeferredRequests();
+        await handleAuthSuccess(response.data);
       } catch (error) {
         setCurrentUser(null);
         showError(error);
+        throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [setCurrentUser, showError, setIsLoading],
+    [handleAuthSuccess, showError],
   );
 
   const login = useCallback(
@@ -75,23 +87,25 @@ export const AuthProvider = ({ children }) => {
           email,
           password,
         });
-        setCurrentUser(response.data);
-        await saveToIDB("currentUser", response.data, "current");
-        await cacheInitialData(response.data.id);
-        await replayDeferredRequests();
+        await handleAuthSuccess(response.data);
+        if (response.data.pushNotificationsEnabled) {
+          await createPushSubscription();
+        }
       } catch (error) {
         setCurrentUser(null);
         showError(error);
+        throw error;
       } finally {
         setIsLoading(false);
       }
     },
-    [setCurrentUser, showError, setIsLoading],
+    [handleAuthSuccess, showError],
   );
 
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
+      await deletePushSubscription();
       await api.post("users/logout");
       setCurrentUser(null);
       await clearIDBStore("currentUser");
@@ -101,7 +115,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [setCurrentUser, showError, setIsLoading]);
+  }, [showError]);
 
   return (
     <AuthContext.Provider

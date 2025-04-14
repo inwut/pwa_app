@@ -1,12 +1,10 @@
 const callDbHandler = require("../utils/callDbHandler");
 const Comment = require("../db/models/comment");
-const User = require("../db/models/user");
 
 const getCommentById = async (id) => {
   return await callDbHandler(() =>
     Comment.findByPk(id, {
-      attributes: ["id", "content"],
-      include: [{ model: User, as: "author", attributes: ["id"] }],
+      attributes: ["id", "content", "authorId", "recipeId"],
     }),
   );
 };

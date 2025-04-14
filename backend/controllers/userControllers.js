@@ -51,11 +51,13 @@ const login = async (req, res) => {
     // secure: true,
     sameSite: "strict",
     maxAge: 24 * 60 * 60 * 1000,
+    // maxAge: 60 * 100,
   });
 
   res.status(200).json({
     id: user.id,
     role: user.role,
+    pushNotificationsEnabled: user.pushNotificationsEnabled,
   });
 };
 
@@ -69,7 +71,20 @@ const me = (req, res) => {
   res.json({
     id: user.id,
     role: user.role,
+    pushNotificationsEnabled: user.pushNotificationsEnabled,
   });
+};
+
+const enablePushNotifications = async (req, res) => {
+  const user = req.user;
+  await userDao.enablePushNotifications(user);
+  res.status(200).json({ message: "Push notifications enabled successfully" });
+};
+
+const disablePushNotifications = async (req, res) => {
+  const user = req.user;
+  await userDao.disablePushNotifications(user);
+  res.status(200).json({ message: "Push notifications disabled successfully" });
 };
 
 const getUsers = async (req, res) => {
@@ -98,6 +113,7 @@ const getUserById = async (req, res) => {
     user: {
       id: user.id,
       username: user.username,
+      pushNotificationsEnabled: user.pushNotificationsEnabled,
       recipes,
       recipeCount: recipes.length,
       followersCount,
@@ -150,4 +166,6 @@ module.exports = {
   getUserById,
   getUserFollowing,
   getUserFollowers,
+  enablePushNotifications,
+  disablePushNotifications,
 };

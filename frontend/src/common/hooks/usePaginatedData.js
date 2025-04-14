@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import useApiRequest from "./useApiRequest";
+import useApiRequest from "./useApiRequest.js";
 import useSearchInput from "./useSearchInput";
 import { getPagedArrayFromIDB, saveArrayToIDB } from "../../utils/indexedDb.js";
 

@@ -15,7 +15,7 @@ import IngredientsTable from "../components/IngredientsTable.jsx";
 import Image from "../../common/components/pageElements/Image.jsx";
 import StyledTextField from "../../common/components/pageElements/StyledTextField.jsx";
 import Loader from "../../common/components/Loader.jsx";
-import useApiRequest from "../../common/hooks/useApiRequest.jsx";
+import useApiRequest from "../../common/hooks/useApiRequest.js";
 import { useNotification } from "../../common/providers/NotificationProvider.jsx";
 import { deleteFromIDB, getFromIDB, saveToIDB } from "../../utils/indexedDb.js";
 
@@ -33,30 +33,37 @@ const CreateRecipePage = () => {
     register,
     handleSubmit,
     setValue,
-    getValues,
     setFocus,
     trigger,
+    watch,
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
   });
 
-  useEffect(() => {
-    const loadDraft = async () => {
-      const draft = await getFromIDB("appData", "draftRecipe");
-      if (draft) {
-        setValue("name", draft.name);
-        setValue("instructions", draft.instructions);
-        setIngredients(draft.ingredients || []);
-        if (draft.image) {
-          setImage(draft.image);
-          setImagePreview(URL.createObjectURL(draft.image));
-        }
+  const name = watch("name");
+  const instructions = watch("instructions");
+  console.log(name, instructions);
+
+  const loadDraft = async () => {
+    const draft = await getFromIDB("appData", "draftRecipe");
+    if (draft) {
+      setValue("name", draft.name);
+      setValue("instructions", draft.instructions);
+      setIngredients(draft.ingredients || []);
+
+      if (draft.image) {
+        setImage(draft.image);
+        setImagePreview(URL.createObjectURL(draft.image));
       }
-    };
+
+      trigger();
+    }
+  };
+
+  useEffect(() => {
     if (!recipeId) {
       loadDraft();
-      trigger();
     }
   }, []);
 
@@ -79,8 +86,8 @@ const CreateRecipePage = () => {
       saveToIDB(
         "appData",
         {
-          name: getValues("name"),
-          instructions: getValues("instructions"),
+          name,
+          instructions,
           ingredients,
           image,
         },
@@ -89,7 +96,7 @@ const CreateRecipePage = () => {
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [getValues("name"), getValues("instructions"), ingredients, image]);
+  }, [name, instructions, ingredients, image]);
 
   const fetchRecipeData = async () => {
     const data = await fetchData(`recipes/edit/${recipeId}`);

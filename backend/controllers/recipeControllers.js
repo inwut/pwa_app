@@ -9,6 +9,7 @@ const {
   saveImage,
   deleteImage,
 } = require("../utils/fileUpload");
+const sendPushNotification = require("../utils/sendPushNotification");
 
 const createRecipe = async (req, res) => {
   const { name, instructions, ingredients } = req.body;
@@ -264,7 +265,18 @@ const likeRecipe = async (req, res) => {
   }
 
   await recipeDao.likeRecipe(recipe, user);
-  await res.status(201).json({ message: "Recipe liked successfully" });
+
+  if (recipe.author.id !== user.id) {
+    await sendPushNotification(recipe.author.id, {
+      title: "Someone liked your recipe",
+      body: `@${user.username} liked your recipe "${recipe.name}"`,
+      data: {
+        url: `/recipes/${recipe.id}`,
+      },
+    });
+  }
+
+  res.status(201).json({ message: "Recipe liked successfully" });
 };
 
 const unlikeRecipe = async (req, res) => {

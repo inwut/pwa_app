@@ -18,7 +18,7 @@ import Comment from "../components/Comment.jsx";
 import Loader from "../../common/components/Loader.jsx";
 import StyledTextField from "../../common/components/pageElements/StyledTextField.jsx";
 import defaultImage from "../../assets/defaultRecipeImage.jpg";
-import useApiRequest from "../../common/hooks/useApiRequest.jsx";
+import useApiRequest from "../../common/hooks/useApiRequest.js";
 import { useAuth } from "../../common/providers/AuthProvider.jsx";
 import { useNotification } from "../../common/providers/NotificationProvider.jsx";
 import { saveToIDB, getFromIDB, getAllFromIDB } from "../../utils/indexedDb.js";
@@ -37,7 +37,7 @@ const RecipePage = () => {
     fetchRecipeData();
   }, []);
 
-  const getCachedData = async () => {
+  const getCachedRecipeData = async () => {
     let cachedData = await getFromIDB("recipes", +recipeId);
     if (!cachedData || !cachedData.ingredients) {
       cachedData = await getFromIDB("favorites", +recipeId);
@@ -55,7 +55,7 @@ const RecipePage = () => {
     }
   };
 
-  const cacheData = async (recipe) => {
+  const cacheRecipeData = async (recipe) => {
     const favorites = await getAllFromIDB("favorites");
     const favoritesIds = favorites.map((f) => f.id);
     if (favoritesIds.includes(recipe.id)) {
@@ -85,9 +85,9 @@ const RecipePage = () => {
     const data = await fetchData(`recipes/${recipeId}`);
     if (data) {
       setRecipe(data.recipe);
-      await cacheData(data.recipe);
+      await cacheRecipeData(data.recipe);
     } else {
-      const cachedData = await getCachedData();
+      const cachedData = await getCachedRecipeData();
       setRecipe(cachedData);
     }
   };

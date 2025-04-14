@@ -10,7 +10,7 @@ const HomePage = () => {
   return (
     <section className="home-page">
       <h1 className="text--heading home-page__title">Recipegram</h1>
-      <p className="text--primary home-page__slogan">
+      <p className="text--heading home-page__slogan">
         Welcome to <span>Recipegram</span> – Your Personal Recipe Collection
       </p>
       <ul className="text--primary home-page__description">
@@ -28,7 +28,7 @@ const HomePage = () => {
         </li>
         <li>
           <span>Stay Updated</span> <IcecreamIcon /> Get push notifications for
-          likes, comments, and new posts.
+          likes, comments, and new followers.
         </li>
       </ul>
     </section>

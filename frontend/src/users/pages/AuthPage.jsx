@@ -12,7 +12,7 @@ import { useAuth } from "../../common/providers/AuthProvider.jsx";
 const AuthPage = () => {
   const { signup, login } = useAuth();
   const navigate = useNavigate();
-  const [isSignUpMode, setIsSignUpMode] = useState(true);
+  const [isSignUpMode, setIsSignUpMode] = useState(false);
   const {
     register,
     handleSubmit,

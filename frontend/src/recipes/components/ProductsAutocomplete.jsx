@@ -3,7 +3,7 @@ import useAutocomplete from "@mui/material/useAutocomplete";
 import CloseIcon from "@mui/icons-material/Close";
 
 import "./ProductsAutocomplete.css";
-import useApiRequest from "../../common/hooks/useApiRequest.jsx";
+import useApiRequest from "../../common/hooks/useApiRequest.js";
 import { saveArrayToIDB, getAllFromIDB } from "../../utils/indexedDb.js";
 
 const ProductsAutocomplete = ({ onIngredientsChange }) => {
