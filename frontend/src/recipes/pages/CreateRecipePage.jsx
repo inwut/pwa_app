@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PhotoIcon from "@mui/icons-material/Photo";
 import { useForm } from "react-hook-form";
@@ -22,9 +22,11 @@ import { deleteFromIDB, getFromIDB, saveToIDB } from "../../utils/indexedDb.js";
 const CreateRecipePage = () => {
   const recipeId = useParams().recipeId;
   const [fetchedRecipe, setFetchedRecipe] = useState(null);
+  const [draftRecipe, setDraftRecipe] = useState(null);
   const [ingredients, setIngredients] = useState([]);
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
+  const fileInputRef = useRef(null);
   const { fetchData, isLoading } = useApiRequest();
   const { showError, showInfo } = useNotification();
   const navigate = useNavigate();
@@ -43,41 +45,26 @@ const CreateRecipePage = () => {
 
   const name = watch("name");
   const instructions = watch("instructions");
-  console.log(name, instructions);
-
-  const loadDraft = async () => {
-    const draft = await getFromIDB("appData", "draftRecipe");
-    if (draft) {
-      setValue("name", draft.name);
-      setValue("instructions", draft.instructions);
-      setIngredients(draft.ingredients || []);
-
-      if (draft.image) {
-        setImage(draft.image);
-        setImagePreview(URL.createObjectURL(draft.image));
-      }
-
-      trigger();
-    }
-  };
-
-  useEffect(() => {
-    if (!recipeId) {
-      loadDraft();
-    }
-  }, []);
 
   useEffect(() => {
     if (recipeId) {
       fetchRecipeData();
+    } else {
+      loadDraftRecipe();
     }
   }, [recipeId]);
 
   useEffect(() => {
     if (fetchedRecipe) {
-      setValues();
+      setValues(fetchedRecipe);
     }
   }, [fetchedRecipe]);
+
+  useEffect(() => {
+    if (draftRecipe) {
+      setValues(draftRecipe);
+    }
+  }, [draftRecipe]);
 
   useEffect(() => {
     if (recipeId) return;
@@ -98,6 +85,13 @@ const CreateRecipePage = () => {
     return () => clearTimeout(timeout);
   }, [name, instructions, ingredients, image]);
 
+  const loadDraftRecipe = async () => {
+    const draft = await getFromIDB("appData", "draftRecipe");
+    if (draft) {
+      setDraftRecipe(draft);
+    }
+  };
+
   const fetchRecipeData = async () => {
     const data = await fetchData(`recipes/edit/${recipeId}`);
     if (data) {
@@ -113,16 +107,28 @@ const CreateRecipePage = () => {
     }
   };
 
-  const setValues = () => {
-    setValue("name", fetchedRecipe.name);
-    setValue("instructions", fetchedRecipe.instructions);
-    setIngredients(fetchedRecipe.ingredients);
-    if (fetchedRecipe.image) {
-      setImage(fetchedRecipe.image);
-      setImagePreview(`http://localhost:5000/uploads/${fetchedRecipe.image}`);
+  const setValues = (recipe) => {
+    if (recipe.name) {
+      setValue("name", recipe.name, { shouldDirty: true, shouldTouch: true });
+      trigger("name");
+    }
+    if (recipe.instructions) {
+      setValue("instructions", recipe.instructions, {
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+      trigger("instructions");
+    }
+    if (recipe.ingredients) setIngredients(recipe.ingredients);
+    if (recipe.image) {
+      setImage(recipe.image);
+      setImagePreview(
+        recipeId
+          ? `http://localhost:5000/uploads/${fetchedRecipe.image}`
+          : URL.createObjectURL(recipe.image),
+      );
     }
     setFocus("name");
-    trigger();
   };
 
   const onSubmit = async (data) => {
@@ -177,6 +183,9 @@ const CreateRecipePage = () => {
   const deleteImageHandler = () => {
     setImage(null);
     setImagePreview("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -194,6 +203,7 @@ const CreateRecipePage = () => {
                 label="Name"
                 type="text"
                 autoComplete="off"
+                value={name || ""}
                 fullWidth
                 {...register("name", {
                   required: "Name is required.",
@@ -207,6 +217,7 @@ const CreateRecipePage = () => {
                 multiline
                 minRows="3"
                 autoComplete="off"
+                value={instructions || ""}
                 fullWidth
                 {...register("instructions", {
                   required: "Instructions are required.",
@@ -218,6 +229,7 @@ const CreateRecipePage = () => {
                 id="fileInput"
                 type="file"
                 accept="image/*"
+                ref={fileInputRef}
                 style={{ display: "none" }}
                 onChange={changeImageHandler}
               />

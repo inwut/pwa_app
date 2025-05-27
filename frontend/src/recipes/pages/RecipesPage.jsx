@@ -23,10 +23,15 @@ const RecipesPage = () => {
     setSearchInput,
     fetchDataFromApi,
     hasMore,
-  } = usePaginatedData("recipes", "recipes", {
-    onlyFollowing: isOnlyFollowing || null,
-    ingredients: ingredients.map((ing) => ing.name).join(",") || null,
-  });
+  } = usePaginatedData(
+    "recipes",
+    "recipes",
+    {},
+    {
+      onlyFollowing: isOnlyFollowing || null,
+      ingredients: ingredients.map((ing) => ing.name).join(",") || null,
+    },
+  );
 
   const updateRecipeLikes = (recipeId, isLiked) => {
     setRecipes((prevRecipes) =>

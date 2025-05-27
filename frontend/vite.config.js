@@ -7,16 +7,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      devOptions: {
-        enabled: true,
-      },
       strategies: "injectManifest",
       srcDir: "src",
-      filename: "sw.js",
       injectManifest: {
         swSrc: "src/sw.js",
-        swDest: "./dist/sw.js",
-        globDirectory: "./dist",
         globPatterns: [
           "**/*.html",
           "**/*.js",
@@ -26,18 +20,16 @@ export default defineConfig({
           "**/*.jpg",
         ],
       },
-      includeAssets: [
-        "favicon.ico",
-        "apple-touch-icon-180x180.png",
-        "maskable-icon-512x512.png",
-      ],
       manifest: {
-        name: "Recipegram",
+        name: "Recipegram: Progressive Web App",
         short_name: "Recipegram",
         description:
           "A progressive web app for sharing your favorite recipes and discovering new ones.",
         theme_color: "#476730",
         background_color: "#f9faef",
+        display: "standalone",
+        start_url: "/",
+        scope: "/",
         icons: [
           {
             src: "pwa-64x64.png",
@@ -61,11 +53,6 @@ export default defineConfig({
             purpose: "maskable",
           },
         ],
-        orientation: "any",
-        display: "standalone",
-        dir: "auto",
-        start_url: "/",
-        scope: "/",
       },
     }),
   ],

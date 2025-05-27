@@ -111,6 +111,10 @@ export const AuthProvider = ({ children }) => {
       await clearIDBStore("currentUser");
       await clearInitialData();
     } catch (error) {
+      if (!navigator.onLine) {
+        setCurrentUser(null);
+        return;
+      }
       showError(error);
     } finally {
       setIsLoading(false);

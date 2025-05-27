@@ -91,15 +91,16 @@ const ProfilePage = () => {
           <PageHeader>
             <PageTitle text={`@${user.username}`} />
             {currentUser &&
-            currentUser.role === "user" &&
-            user.id !== currentUser.id ? (
-              <Button
-                text={user.isFollowed ? "Unfollow" : "Follow"}
-                filled
-                size="large"
-                onClick={subscriptionHandler}
-              />
-            ) : (
+              currentUser.role === "user" &&
+              user.id !== currentUser.id && (
+                <Button
+                  text={user.isFollowed ? "Unfollow" : "Follow"}
+                  filled
+                  size="large"
+                  onClick={subscriptionHandler}
+                />
+              )}
+            {currentUser && currentUser.id === user.id && (
               <PushNotificationToggle />
             )}
           </PageHeader>
